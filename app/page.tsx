@@ -81,33 +81,24 @@ export default async function HomePage() {
                       <Users size={20} className="text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-lg">
-                        Welcome back, {fullUser.name}
-                      </h3>
+                      <h3 className="font-semibold text-lg">{fullUser.name}</h3>
                       <p className="text-blue-200 text-sm capitalize">
                         {fullUser.role.toLowerCase()} Account
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <Button
-                      asChild
-                      variant="secondary"
-                      size="sm"
+                    <LoadingButton
+                      href={
+                        fullUser.role === "FACULTY"
+                          ? "/faculty/dashboard"
+                          : "/student/dashboard"
+                      }
                       className="bg-white/20 hover:bg-white/30 text-white border-0 rounded-lg"
                     >
-                      <Link href="/private">Dashboard</Link>
-                    </Button>
-                    {fullUser.role === "FACULTY" && (
-                      <Button
-                        asChild
-                        variant="secondary"
-                        size="sm"
-                        className="bg-white/20 hover:bg-white/30 text-white border-0 rounded-lg"
-                      >
-                        <Link href="/admin">Admin Panel</Link>
-                      </Button>
-                    )}
+                      DashBoard
+                    </LoadingButton>
+
                     <LogOutButton />
                   </div>
                 </div>
