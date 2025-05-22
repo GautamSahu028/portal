@@ -1,7 +1,11 @@
-import React from "react";
+import { getCurrentUser } from "@/auth/nextjs/currentUser";
+import { StudentDashboardComponent } from "@/components/student/StudentDashBoardComponent";
 
-const StudentDashBoard = () => {
-  return <div>StudentDashBoard</div>;
-};
-
-export default StudentDashBoard;
+export default async function StudentDashboard() {
+  // Server-side user fetching and validation
+  const user = await getCurrentUser({
+    withFullUser: true,
+    redirectIfNotFound: true,
+  });
+  return <StudentDashboardComponent user={user} />;
+}
