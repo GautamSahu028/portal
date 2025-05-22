@@ -16,8 +16,10 @@ import {
   Layers,
   Users,
   MessageCircle,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
+import { LoadingButton } from "@/components/Buttons/LoadingButton";
 
 export default async function HomePage() {
   // const fullUser = null;
@@ -37,8 +39,8 @@ export default async function HomePage() {
         </div>
 
         <div className="max-w-7xl mx-auto relative">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-12">
-            <div className="flex-1 text-left">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+            <div className="flex-1 text-center lg:text-left">
               <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6 border border-white/20">
                 <GraduationCap size={24} />
                 <span className="text-sm font-medium">
@@ -54,22 +56,23 @@ export default async function HomePage() {
               </p>
 
               {fullUser == null ? (
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                  <LoadingButton
+                    href="/sign-in"
                     size="lg"
-                    className="bg-white text-blue-700 hover:bg-blue-50 font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
-                  >
-                    <Link href="/sign-in" className="flex items-center gap-2">
-                      Sign In
-                    </Link>
-                  </Button>
-                  <Button
-                    size="lg"
+                    className="custom-styles"
                     variant="outline"
-                    className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm font-semibold px-8 py-3 rounded-xl transition-all duration-200"
                   >
-                    <Link href="/sign-up">Get Started</Link>
-                  </Button>
+                    Sign In
+                  </LoadingButton>
+                  <LoadingButton
+                    href="/sign-up"
+                    size="lg"
+                    className="custom-styles"
+                    variant="outline"
+                  >
+                    Get Started
+                  </LoadingButton>
                 </div>
               ) : (
                 <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 max-w-md">
@@ -93,16 +96,18 @@ export default async function HomePage() {
                       size="sm"
                       className="bg-white/20 hover:bg-white/30 text-white border-0 rounded-lg"
                     >
-                      <Link
-                        href={
-                          fullUser.role == "FACULTY"
-                            ? "/faculty/dashboard"
-                            : "/faculty/student"
-                        }
-                      >
-                        Dashboard
-                      </Link>
+                      <Link href="/private">Dashboard</Link>
                     </Button>
+                    {fullUser.role === "FACULTY" && (
+                      <Button
+                        asChild
+                        variant="secondary"
+                        size="sm"
+                        className="bg-white/20 hover:bg-white/30 text-white border-0 rounded-lg"
+                      >
+                        <Link href="/admin">Admin Panel</Link>
+                      </Button>
+                    )}
                     <LogOutButton />
                   </div>
                 </div>
@@ -110,7 +115,7 @@ export default async function HomePage() {
             </div>
 
             <div className="flex-1 flex justify-center lg:justify-end">
-              <div className="relative flex justify-center lg:justify-end">
+              <div className="relative">
                 <div className="w-80 h-80 lg:w-96 lg:h-96 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-sm rounded-3xl flex items-center justify-center border border-white/20 shadow-2xl">
                   <GraduationCap
                     size={120}

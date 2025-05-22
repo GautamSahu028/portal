@@ -24,12 +24,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { signUp } from "../actions";
+import {
+  User,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  UserCheck,
+  GraduationCap,
+} from "lucide-react";
 
 // Infer TypeScript type from Zod schema
 type Inputs = z.infer<typeof signUpSchema>;
 
 export function SignUpForm() {
   const [error, setError] = useState<string | undefined>();
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<Inputs>({
     resolver: zodResolver(signUpSchema),
@@ -37,30 +48,47 @@ export function SignUpForm() {
       name: "",
       email: "",
       password: "",
-      role: undefined, // or "USER" as default
+      role: undefined,
     },
   });
 
   const onSubmit = async (data: Inputs) => {
+    setIsLoading(true);
     const error = await signUp(data);
     setError(error);
+    setIsLoading(false);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {error && <p className="text-destructive text-sm">{error}</p>}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+            <p className="text-red-200 text-sm">{error}</p>
+          </div>
+        )}
+
         {/* Name Field */}
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel className="text-white font-medium">
+                Full Name
+              </FormLabel>
               <FormControl>
-                <Input type="text" {...field} />
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 w-4 h-4" />
+                  <Input
+                    type="text"
+                    placeholder="Enter your full name"
+                    className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 focus:bg-white/15 rounded-lg h-12"
+                    {...field}
+                  />
+                </div>
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-200" />
             </FormItem>
           )}
         />
@@ -71,11 +99,21 @@ export function SignUpForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel className="text-white font-medium">
+                Email Address
+              </FormLabel>
               <FormControl>
-                <Input type="email" {...field} />
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 w-4 h-4" />
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 focus:bg-white/15 rounded-lg h-12"
+                    {...field}
+                  />
+                </div>
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-200" />
             </FormItem>
           )}
         />
@@ -86,11 +124,30 @@ export function SignUpForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel className="text-white font-medium">Password</FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 w-4 h-4" />
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Create a password"
+                    className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 focus:bg-white/15 rounded-lg h-12"
+                    {...field}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white/80 transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-200" />
             </FormItem>
           )}
         />
@@ -101,29 +158,55 @@ export function SignUpForm() {
           name="role"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Role</FormLabel>
+              <FormLabel className="text-white font-medium">
+                Account Type
+              </FormLabel>
               <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="FACULTY">FACULTY</SelectItem>
-                    <SelectItem value="STUDENT">STUDENT</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="relative">
+                  <UserCheck className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 w-4 h-4 z-10" />
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="pl-10 bg-white/10 border-white/20 text-gray-900 focus:border-white/40 focus:bg-white/15 rounded-lg h-12 [&>span]:text-white [&>span]:placeholder:text-white/50">
+                      <SelectValue placeholder="Select your role" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white backdrop-blur-md border border-gray-200 shadow-lg">
+                      <SelectItem
+                        value="FACULTY"
+                        className="hover:bg-blue-150 focus:bg-blue-50 hover:text-gray-900 focus:text-gray-900 text-gray-900 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2">
+                          <GraduationCap className="w-4 h-4 text-blue-600" />
+                          <span className="text-inherit">Faculty Member</span>
+                        </div>
+                      </SelectItem>
+
+                      <SelectItem
+                        value="STUDENT"
+                        className="hover:bg-blue-150 focus:bg-blue-50 hover:text-gray-900 focus:text-gray-900 text-gray-900 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2">
+                          <GraduationCap className="w-4 h-4 text-blue-600" />
+                          <span className="text-inherit">Student</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-200" />
             </FormItem>
           )}
         />
 
-        {/* Buttons */}
-        <div className="flex gap-4 justify-end">
-          <Button asChild variant="link">
-            <Link href="/sign-in">Sign In</Link>
+        <div className="flex flex-col space-y-4 pt-2">
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-white/20 hover:bg-white/30 text-white border-0 rounded-lg h-12 font-semibold transition-all duration-200 hover:scale-105 hover:cursor-pointer"
+          >
+            {isLoading ? "Creating Account..." : "Create Account"}
           </Button>
-          <Button type="submit">Sign Up</Button>
+
+          <div className="text-center"></div>
         </div>
       </form>
     </Form>
