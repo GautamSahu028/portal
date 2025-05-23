@@ -58,7 +58,7 @@ export default function DashboardLayout({
   const navItems = isStudent ? getStudentNavItems() : getFacultyNavItems();
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-screen flex-col overflow-hiddenl">
       {/* Mobile Header */}
       <div className="border-b lg:hidden">
         <div className="flex h-16 items-center justify-between px-4">
@@ -132,7 +132,7 @@ export default function DashboardLayout({
       )}
 
       {/* Desktop Layout */}
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-hidden">
         {/* Desktop Sidebar */}
         <aside className="hidden w-64 border-r bg-background lg:block">
           <div className="flex flex-col h-full">
@@ -175,8 +175,9 @@ export default function DashboardLayout({
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1">
-          <div className="hidden h-16 items-center gap-4 border-b px-6 lg:flex">
+        <main className="flex-1 overflow-hidden flex flex-col">
+          {/* Fixed Search Bar */}
+          <div className="hidden h-16 items-center gap-4 border-b px-6 lg:flex shrink-0">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -190,7 +191,9 @@ export default function DashboardLayout({
               <UserMenu user={user} onLogout={handleLogout} />
             </div>
           </div>
-          <div className="p-6">{children}</div>
+
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-auto p-6">{children}</div>
         </main>
       </div>
     </div>
