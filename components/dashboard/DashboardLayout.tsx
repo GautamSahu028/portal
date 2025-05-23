@@ -32,6 +32,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Input } from "@/components/ui/input";
 import { User } from "@prisma/client";
 import { toast } from "sonner";
+import { getFacultyNavItems, getStudentNavItems } from "./routes";
 
 interface DashboardLayoutProps {
   user: User;
@@ -53,82 +54,6 @@ export default function DashboardLayout({
     toast("Logged out successfully");
     router.push("/");
   };
-
-  const getFacultyNavItems = () => [
-    {
-      title: "Dashboard",
-      href: "/dashboard/faculty",
-      icon: <GraduationCap className="h-5 w-5" />,
-    },
-    {
-      title: "Students",
-      href: "/faculty/students",
-      icon: <Users className="h-5 w-5" />,
-    },
-    {
-      title: "Attendance",
-      href: "/faculty/attendance",
-      icon: <Calendar className="h-5 w-5" />,
-    },
-    {
-      title: "Grades",
-      href: "/faculty/grades",
-      icon: <BookOpen className="h-5 w-5" />,
-    },
-    {
-      title: "Courses",
-      href: "/faculty/courses",
-      icon: <BookOpen className="h-5 w-5" />,
-    },
-    {
-      title: "Announcements",
-      href: "/faculty/announcements",
-      icon: <Bell className="h-5 w-5" />,
-    },
-    {
-      title: "Messages",
-      href: "/faculty/messages",
-      icon: <MessageSquare className="h-5 w-5" />,
-    },
-  ];
-
-  const getStudentNavItems = () => [
-    {
-      title: "Dashboard",
-      href: "/dashboard/student",
-      icon: <GraduationCap className="h-5 w-5" />,
-    },
-    {
-      title: "Profile",
-      href: "/student/profile",
-      icon: <Users className="h-5 w-5" />,
-    },
-    {
-      title: "Attendance",
-      href: "/student/attendance",
-      icon: <Calendar className="h-5 w-5" />,
-    },
-    {
-      title: "Grades",
-      href: "/student/grades",
-      icon: <BookOpen className="h-5 w-5" />,
-    },
-    {
-      title: "Schedule",
-      href: "/student/schedule",
-      icon: <Calendar className="h-5 w-5" />,
-    },
-    {
-      title: "Announcements",
-      href: "/student/announcements",
-      icon: <Bell className="h-5 w-5" />,
-    },
-    {
-      title: "Messages",
-      href: "/student/messages",
-      icon: <MessageSquare className="h-5 w-5" />,
-    },
-  ];
 
   const navItems = isStudent ? getStudentNavItems() : getFacultyNavItems();
 
