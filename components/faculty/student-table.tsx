@@ -1,19 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Table, TableBody, TableCell, 
-  TableHead, TableHeader, TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Select, SelectContent, SelectItem, 
-  SelectTrigger, SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import { 
-  ChevronLeft, ChevronRight, Search, 
-  FileText, UserCog, Eye, MoreHorizontal 
+import {
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  FileText,
+  UserCog,
+  Eye,
+  MoreHorizontal,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -113,26 +125,31 @@ export default function StudentTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState("all");
   const itemsPerPage = 5;
-  
+
   // Filter and search students
   const filteredStudents = students.filter((student) => {
-    const matchesSearch = 
+    const matchesSearch =
       student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       student.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       student.id.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
     if (filter === "all") return matchesSearch;
-    if (filter === "high-attendance") return matchesSearch && student.attendance >= 90;
-    if (filter === "low-attendance") return matchesSearch && student.attendance < 80;
-    
+    if (filter === "high-attendance")
+      return matchesSearch && student.attendance >= 90;
+    if (filter === "low-attendance")
+      return matchesSearch && student.attendance < 80;
+
     return matchesSearch;
   });
-  
+
   // Pagination
   const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedStudents = filteredStudents.slice(startIndex, startIndex + itemsPerPage);
-  
+  const paginatedStudents = filteredStudents.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4">
@@ -149,21 +166,28 @@ export default function StudentTable() {
             }}
           />
         </div>
-        <Select value={filter} onValueChange={(value) => {
-          setFilter(value);
-          setCurrentPage(1);
-        }}>
+        <Select
+          value={filter}
+          onValueChange={(value) => {
+            setFilter(value);
+            setCurrentPage(1);
+          }}
+        >
           <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Filter" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Students</SelectItem>
-            <SelectItem value="high-attendance">High Attendance (≥90%)</SelectItem>
-            <SelectItem value="low-attendance">Low Attendance (&lt;80%)</SelectItem>
+            <SelectItem value="high-attendance">
+              High Attendance (≥90%)
+            </SelectItem>
+            <SelectItem value="low-attendance">
+              Low Attendance (&lt;80%)
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
-      
+
       <div className="border rounded-md">
         <Table>
           <TableHeader>
@@ -195,19 +219,25 @@ export default function StudentTable() {
                       {student.email}
                     </div>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">{student.email}</TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {student.email}
+                  </TableCell>
                   <TableCell className="text-right">
-                    <div className={`font-medium ${
-                      student.attendance >= 90 
-                        ? "text-emerald-500" 
-                        : student.attendance < 80 
-                          ? "text-rose-500" 
+                    <div
+                      className={`font-medium ${
+                        student.attendance >= 90
+                          ? "text-emerald-500"
+                          : student.attendance < 80
+                          ? "text-rose-500"
                           : ""
-                    }`}>
+                      }`}
+                    >
                       {student.attendance}%
                     </div>
                   </TableCell>
-                  <TableCell className="text-right font-medium">{student.grade}</TableCell>
+                  <TableCell className="text-right font-medium">
+                    {student.grade}
+                  </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -238,15 +268,14 @@ export default function StudentTable() {
           </TableBody>
         </Table>
       </div>
-      
+
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          Showing {startIndex + 1}-{Math.min(
-            startIndex + itemsPerPage,
-            filteredStudents.length
-          )} of {filteredStudents.length}
+          Showing {startIndex + 1}-
+          {Math.min(startIndex + itemsPerPage, filteredStudents.length)} of{" "}
+          {filteredStudents.length}
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"

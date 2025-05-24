@@ -16,6 +16,10 @@ model User {
   role      Role
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+
+  student   Student?
+  faculty   Faculty?
 }
 
 enum Role {
@@ -23,3 +27,128 @@ enum Role {
   STUDENT
 }
 
+model Student {
+  id               String          @id @default(uuid())
+  userId           String          @unique
+  rollNumber       String          @unique
+  enrollmentNumber String          @unique
+  department       String
+  currentSemester  Int             // current semester number
+
+  user             User            @relation(fields: [userId], references: [id])
+  enrollments      StudentCourse[]
+  attendances      Attendance[]
+  semesters        Semester[]      // relation to semesters with grades
+}
+
+model Faculty {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  employeeId    String   @unique
+  department    String
+  designation   String
+
+  user          User     @relation(fields: [userId], references: [id])
+  courses       Course[]
+  announcements Announcement[]
+}
+
+model Course {
+  id           String          @id @default(uuid())
+  code         String          @unique
+  name         String
+  description  String?
+  facultyId    String
+
+  faculty      Faculty         @relation(fields: [facultyId], references: [id])
+  enrollments  StudentCourse[]
+  attendances  Attendance[]
+  semestersGrades SemesterGrade[]  // link to SemesterGrade to track grades per semester
+  announcements Announcement[]
+  createdAt    DateTime        @default(now())
+}
+
+
+model StudentCourse {
+  id        String   @id @default(uuid())
+  studentId String
+  courseId  String
+
+  student   Student  @relation(fields: [studentId], references: [id])
+  course    Course   @relation(fields: [courseId], references: [id])
+
+  @@unique([studentId, courseId])
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  studentId String
+  courseId  String
+  date      DateTime
+  status    AttendanceStatus
+
+  student   Student  @relation(fields: [studentId], references: [id])
+  course    Course   @relation(fields: [courseId], references: [id])
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+}
+
+
+// model Grade {
+//   id        String   @id @default(uuid())
+//   studentId String
+//   courseId  String
+//   title     String
+//   score     Float
+
+//   student   Student  @relation(fields: [studentId], references: [id])
+//   course    Course   @relation(fields: [courseId], references: [id])
+// }
+
+model Semester {
+  id          String           @id @default(uuid())
+  studentId   String
+  number      Int              // e.g., 5 for 5th semester
+  spi         Float            // Semester Performance Index
+  cpi         Float            // Cumulative Performance Index
+  createdAt   DateTime         @default(now())
+
+  student     Student          @relation(fields: [studentId], references: [id])
+  grades      SemesterGrade[]
+}
+
+model SemesterGrade {
+  id          String   @id @default(uuid())
+  semesterId  String
+  courseId    String
+  grade       Grade   // e.g., A, B, O
+  gradePoint  Int      // e.g., 10, 9, 8
+
+  semester    Semester @relation(fields: [semesterId], references: [id])
+  course      Course   @relation(fields: [courseId], references: [id])
+}
+
+enum Grade {
+  A
+  B
+  C
+  D
+  E
+  F
+  O
+}
+
+model Announcement {
+  id         String   @id @default(uuid())
+  title      String
+  content    String
+  courseId   String?
+  facultyId  String
+  postedAt   DateTime @default(now())
+
+  faculty    Faculty  @relation(fields: [facultyId], references: [id])
+  course     Course?  @relation(fields: [courseId], references: [id])
+}

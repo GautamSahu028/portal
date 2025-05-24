@@ -15,7 +15,7 @@ export const getFacultyNavItems = () => [
   },
   {
     title: "Students",
-    href: "/faculty/students",
+    href: "/faculty/manage-students",
     icon: <Users className="h-5 w-5" />,
   },
   {
