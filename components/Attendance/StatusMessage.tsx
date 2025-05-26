@@ -12,19 +12,25 @@ const StatusMessage: React.FC<StatusMessageProps> = ({
   switch (status) {
     case "uploaded":
       return (
-        <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
-          <p className="text-blue-700">
-            Image successfully uploaded. Click "Generate Report" to process
-            attendance.
-          </p>
+        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 mb-4">
+          <div className="flex items-center">
+            <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
+            <p className="text-slate-300 text-sm">
+              Image successfully uploaded. Click "Generate Report" to process
+              attendance.
+            </p>
+          </div>
         </div>
       );
     case "processed":
       return (
-        <div className="bg-green-50 border-l-4 border-green-500 p-4">
-          <p className="text-green-700">
-            Attendance successfully recorded for {getTodayDate()}
-          </p>
+        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 mb-4">
+          <div className="flex items-center">
+            <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+            <p className="text-slate-300 text-sm">
+              Attendance successfully recorded for {getTodayDate()}
+            </p>
+          </div>
         </div>
       );
     default:

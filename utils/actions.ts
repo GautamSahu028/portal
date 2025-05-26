@@ -1,5 +1,6 @@
 import db from "@/utils/db";
 import { getCurrentUser } from "@/auth/nextjs/currentUser";
+import { FacultyCourse } from "./types";
 
 export async function getStudentsByFaculty() {
   try {
@@ -97,7 +98,6 @@ export async function getStudentsByFaculty() {
   }
 }
 
-// Alternative version that gets students for a specific course
 export async function getStudentsByCourse(courseId: string) {
   try {
     const currentUser = await getCurrentUser();
@@ -186,6 +186,300 @@ export async function getStudentsByCourse(courseId: string) {
         error instanceof Error ? error.message : "An unexpected error occurred",
       data: [],
       totalStudents: 0,
+    };
+  }
+}
+
+export async function getFacultyCoursesByUserId(
+  userId: string
+): Promise<FacultyCourse[]> {
+  try {
+    const courses = await db.course.findMany({
+      where: {
+        faculty: {
+          userId: userId,
+        },
+      },
+      include: {
+        faculty: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        enrollments: {
+          include: {
+            student: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            student: {
+              user: {
+                name: "asc",
+              },
+            },
+          },
+        },
+        _count: {
+          select: {
+            enrollments: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return courses.map((course) => ({
+      id: course.id,
+      code: course.code,
+      name: course.name,
+      description: course.description,
+      createdAt: course.createdAt,
+      enrolledStudentsCount: course._count.enrollments,
+      enrolledStudents: course.enrollments.map((enrollment) => ({
+        id: enrollment.student.id,
+        rollNumber: enrollment.student.rollNumber,
+        enrollmentNumber: enrollment.student.enrollmentNumber,
+        department: enrollment.student.department,
+        currentSemester: enrollment.student.currentSemester,
+        user: {
+          id: enrollment.student.user.id,
+          name: enrollment.student.user.name,
+          email: enrollment.student.user.email,
+        },
+      })),
+      faculty: {
+        id: course.faculty.id,
+        employeeId: course.faculty.employeeId,
+        department: course.faculty.department,
+        designation: course.faculty.designation,
+        user: {
+          name: course.faculty.user.name,
+          email: course.faculty.user.email,
+        },
+      },
+    }));
+  } catch (error) {
+    console.error("Error fetching faculty courses:", error);
+    throw new Error("Failed to fetch faculty courses");
+  }
+}
+
+// You'll also need to update the FacultyCourse interface to include the enrolledStudents
+export interface EnrolledStudent {
+  id: string;
+  rollNumber: string;
+  enrollmentNumber: string;
+  department: string;
+  currentSemester: number;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+export async function getCourse(courseId: string) {
+  try {
+    const course = await db.course.findUnique({
+      where: {
+        id: courseId,
+      },
+      include: {
+        faculty: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        enrollments: {
+          include: {
+            student: {
+              include: {
+                user: {
+                  select: {
+                    name: true,
+                    email: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        attendances: {
+          include: {
+            student: {
+              include: {
+                user: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            date: "desc",
+          },
+        },
+        announcements: {
+          orderBy: {
+            postedAt: "desc",
+          },
+        },
+        semestersGrades: {
+          include: {
+            semester: {
+              include: {
+                student: {
+                  include: {
+                    user: {
+                      select: {
+                        name: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!course) {
+      return {
+        success: false,
+        error: "Course not found",
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      error: null,
+      data: course,
+    };
+  } catch (error) {
+    console.error("Error fetching course:", error);
+    return {
+      success: false,
+      error: "Failed to fetch course",
+      data: null,
+    };
+  }
+}
+
+// Alternative lighter version if you only need basic course info
+export async function getCourseBasic(courseId: string) {
+  try {
+    const course = await db.course.findUnique({
+      where: {
+        id: courseId,
+      },
+      include: {
+        faculty: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!course) {
+      return {
+        success: false,
+        error: "Course not found",
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      error: null,
+      data: course,
+    };
+  } catch (error) {
+    console.error("Error fetching course:", error);
+    return {
+      success: false,
+      error: "Failed to fetch course",
+      data: null,
+    };
+  }
+}
+
+// Get course with enrolled students count
+export async function getCourseWithStats(courseId: string) {
+  try {
+    const course = await db.course.findUnique({
+      where: {
+        id: courseId,
+      },
+      include: {
+        faculty: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        _count: {
+          select: {
+            enrollments: true,
+            attendances: true,
+            announcements: true,
+          },
+        },
+      },
+    });
+
+    if (!course) {
+      return {
+        success: false,
+        error: "Course not found",
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      error: null,
+      data: course,
+    };
+  } catch (error) {
+    console.error("Error fetching course:", error);
+    return {
+      success: false,
+      error: "Failed to fetch course",
+      data: null,
     };
   }
 }
