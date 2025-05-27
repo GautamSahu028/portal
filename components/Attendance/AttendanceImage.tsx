@@ -135,15 +135,18 @@ const AttendanceImage: React.FC<AttendanceImageProps> = ({
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0">
       {/* Image Preview Container */}
-      <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-6 shadow-xl">
-        <div className="relative group">
-          <img
-            src={imagePreview}
-            alt="Attendance"
-            className="w-full h-auto rounded-xl shadow-lg border border-slate-600/50 transition-transform duration-300 group-hover:scale-[1.02]"
-          />
+      <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-6 shadow-xl overflow-hidden">
+        <div className="relative group w-full">
+          {/* Image Container with proper constraints */}
+          <div className="w-full max-w-full overflow-hidden rounded-xl">
+            <img
+              src={imagePreview}
+              alt="Attendance"
+              className="w-full h-auto max-h-80 sm:max-h-96 lg:max-h-[32rem] object-contain rounded-xl shadow-lg border border-slate-600/50 transition-transform duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
 
           {/* Image Overlay Info */}
           <div className="absolute top-4 right-4 bg-slate-900/80 backdrop-blur-sm text-white px-3 py-1 rounded-lg border border-slate-600/50">
@@ -157,7 +160,7 @@ const AttendanceImage: React.FC<AttendanceImageProps> = ({
       {/* Image Details */}
       <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-6 shadow-xl">
         <div className="flex items-center gap-3 mb-6">
-          <div className="bg-green-500/20 rounded-lg p-2 border border-green-500/30">
+          <div className="bg-green-500/20 rounded-lg p-2 border border-green-500/30 flex-shrink-0">
             <svg
               className="w-5 h-5 text-green-400"
               fill="none"
@@ -172,24 +175,26 @@ const AttendanceImage: React.FC<AttendanceImageProps> = ({
               />
             </svg>
           </div>
-          <h4 className="text-lg font-semibold text-white">File Information</h4>
+          <h4 className="text-lg font-semibold text-white truncate">
+            File Information
+          </h4>
         </div>
 
         <div className="grid gap-4">
           {detailItems.map((item, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-4 bg-slate-700/40 backdrop-blur-sm rounded-xl border border-slate-600/50 hover:border-slate-500/50 transition-all duration-300 hover:bg-slate-700/60 group"
+              className="flex items-center justify-between p-4 bg-slate-700/40 backdrop-blur-sm rounded-xl border border-slate-600/50 hover:border-slate-500/50 transition-all duration-300 hover:bg-slate-700/60 group min-w-0"
             >
-              <div className="flex items-center gap-3">
-                <div className="text-slate-400 group-hover:text-slate-300 transition-colors duration-300">
+              <div className="flex items-center gap-3 min-w-0 flex-shrink-0">
+                <div className="text-slate-400 group-hover:text-slate-300 transition-colors duration-300 flex-shrink-0">
                   {item.icon}
                 </div>
-                <span className="font-medium text-slate-300 group-hover:text-white transition-colors duration-300">
+                <span className="font-medium text-slate-300 group-hover:text-white transition-colors duration-300 whitespace-nowrap">
                   {item.label}:
                 </span>
               </div>
-              <span className="text-white font-medium text-right break-all max-w-xs">
+              <span className="text-white font-medium text-right break-words max-w-[60%] min-w-0 overflow-wrap-anywhere">
                 {item.value}
               </span>
             </div>

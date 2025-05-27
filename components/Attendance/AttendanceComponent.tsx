@@ -11,22 +11,32 @@ import EmptyState from "./EmptyState";
 import StatusMessage from "./StatusMessage";
 import CameraComponent from "./CameraComponent";
 import axios from "axios";
-import { AttendanceRecord, FacultyCourse } from "@/utils/types";
+import {
+  AttendanceOutput,
+  AttendanceRecord,
+  FacultyCourse,
+} from "@/utils/types";
 import FutureScope from "./FutureScope";
 import {
   getCombinedAttendance,
   parseAttendanceData,
 } from "./utils/utilityFunctions";
+import db from "@/utils/db";
+import { toast } from "sonner";
 
 function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [attendanceStatus, setAttendanceStatus] = useState("none"); // "none", "uploaded", "processed"
-  const [attendanceResults, setAttendanceResults] = useState<
+  const [fullAttendanceRecords, setFullAttendanceRecords] = useState<
     AttendanceRecord[]
   >([]);
+  const [finalAttendance, setFinalAttendance] = useState<AttendanceOutput[]>(
+    []
+  );
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isFinalAttendance, setIsFinalAttendance] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState<string>("");
   const [courseSelectionError, setCourseSelectionError] = useState<
@@ -53,7 +63,8 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
   function handleFileChange(event: FileChangeEvent) {
     const file = event.target.files[0];
     setError(null);
-    setAttendanceResults([]);
+    setFullAttendanceRecords([]);
+    setFinalAttendance([]);
 
     if (!file) return;
 
@@ -83,7 +94,7 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
     }
 
     // Show success message
-    alert(
+    toast(
       preview
         ? "Image has been successfully captured!"
         : "Image has been successfully uploaded!"
@@ -131,6 +142,7 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
     if (uploadedImage) {
       try {
         setIsProcessing(true);
+        setIsFinalAttendance(false);
         setCourseSelectionError(null);
 
         // Actual API implementation with Gradio client
@@ -146,21 +158,53 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
           split_faces,
           selectedCourse?.code ?? "N/A"
         );
-        setAttendanceResults(parseSplitFaces);
-        setAttendanceStatus("processed");
+        const { finalAttendance, fullAttendanceRecords } =
+          getCombinedAttendance(courses, parseSplitFaces);
+        setFinalAttendance(finalAttendance);
+        console.log("FinalAttendance : ", finalAttendance);
+        setFullAttendanceRecords(fullAttendanceRecords);
 
         // Here you would also send the selectedCourseId to your database
         console.log("Selected Course ID for attendance:", selectedCourseId);
 
-        alert(`Attendance recorded for ${split_faces.length} people!`);
+        toast(`Attendance recorded for ${split_faces.length} people!`);
       } catch (err) {
         console.error("API Error:", err);
         setError(`Failed to process attendance: ${(err as Error).message}`);
       } finally {
         setIsProcessing(false);
+        setIsFinalAttendance(true);
+        setAttendanceStatus("processed");
       }
     } else {
-      alert("Please upload or capture an attendance image first.");
+      toast("Please upload or capture an attendance image first.");
+    }
+  }
+
+  async function upsertFinalAttendance(finalAttendance: AttendanceOutput[]) {
+    try {
+      setIsProcessing(true);
+
+      const response = await axios.post(
+        "/api/upsertAttendance",
+        finalAttendance,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast("Successfully uploaded data to database");
+      } else {
+        console.error("Upload failed:", response.data.error);
+      }
+    } catch (error) {
+      console.error("Error in upserting attendance:", error);
+    } finally {
+      setIsProcessing(false);
+      setAttendanceStatus("DBuploaded");
     }
   }
 
@@ -168,13 +212,6 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
   const selectedCourse = courses.find(
     (course) => course.id === selectedCourseId
   );
-
-  const { finalAttendance, fullAttendanceRecords } = getCombinedAttendance(
-    courses,
-    attendanceResults
-  );
-
-  console.log("FinalAttendance : ", finalAttendance);
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
@@ -184,6 +221,9 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
           handleTakeAttendance={handleTakeAttendance}
           isProcessing={isProcessing}
           uploadedImage={uploadedImage}
+          isFinalAttendance={isFinalAttendance}
+          upsertAttendance={upsertFinalAttendance}
+          finalAttendance={finalAttendance}
         />
 
         {/* Course Selection Card */}
@@ -343,14 +383,15 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
             </div>
 
             <div className="grid lg:grid-cols-2 gap-6">
-              <div>
+              {/* Image container with proper constraints */}
+              <div className="min-w-0 overflow-hidden">
                 <AttendanceImage
                   imagePreview={imagePreview}
                   uploadedImage={uploadedImage}
                 />
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-6 min-w-0">
                 <div>
                   <h3 className="text-lg font-medium text-white mb-3">
                     Processing Status
@@ -365,7 +406,7 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
                 {isProcessing && <LoadingIndicator />}
 
                 {/* Attendance Results */}
-                {attendanceResults.length > 0 && (
+                {fullAttendanceRecords.length > 0 && (
                   <AttendanceResults results={fullAttendanceRecords} />
                 )}
               </div>

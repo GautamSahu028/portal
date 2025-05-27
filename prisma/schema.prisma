@@ -81,15 +81,20 @@ model StudentCourse {
 }
 
 model Attendance {
-  id        String   @id @default(uuid())
-  studentId String
-  courseId  String
-  date      DateTime
-  status    AttendanceStatus
+  id                    String            @id @default(uuid())
+  studentId             String
+  courseId              String
+  date                  DateTime
+  status                AttendanceStatus
+  totalClassesTillDate  Int               @default(1)
+  totalPresentTillDate  Int               @default(0)
 
   student   Student  @relation(fields: [studentId], references: [id])
   course    Course   @relation(fields: [courseId], references: [id])
+
+  @@unique([studentId, courseId, date]) // optional but recommended for upsert logic
 }
+
 
 enum AttendanceStatus {
   PRESENT

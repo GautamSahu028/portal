@@ -1,6 +1,6 @@
 import db from "@/utils/db";
 import { getCurrentUser } from "@/auth/nextjs/currentUser";
-import { FacultyCourse } from "./types";
+import { AttendanceOutput, FacultyCourse } from "./types";
 
 export async function getStudentsByFaculty() {
   try {
@@ -280,20 +280,6 @@ export async function getFacultyCoursesByUserId(
   }
 }
 
-// You'll also need to update the FacultyCourse interface to include the enrolledStudents
-export interface EnrolledStudent {
-  id: string;
-  rollNumber: string;
-  enrollmentNumber: string;
-  department: string;
-  currentSemester: number;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-  };
-}
-
 export async function getCourse(courseId: string) {
   try {
     const course = await db.course.findUnique({
@@ -389,7 +375,6 @@ export async function getCourse(courseId: string) {
   }
 }
 
-// Alternative lighter version if you only need basic course info
 export async function getCourseBasic(courseId: string) {
   try {
     const course = await db.course.findUnique({
@@ -433,7 +418,6 @@ export async function getCourseBasic(courseId: string) {
   }
 }
 
-// Get course with enrolled students count
 export async function getCourseWithStats(courseId: string) {
   try {
     const course = await db.course.findUnique({
