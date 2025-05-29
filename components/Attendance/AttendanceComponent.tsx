@@ -21,7 +21,6 @@ import {
   getCombinedAttendance,
   parseAttendanceData,
 } from "./utils/utilityFunctions";
-import db from "@/utils/db";
 import { toast } from "sonner";
 
 function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
@@ -185,23 +184,32 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
     try {
       setIsProcessing(true);
 
-      const response = await axios.post(
-        "/api/upsertAttendance",
-        finalAttendance,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const formattedDate = new Date()
+        .toLocaleString("sv-SE", { timeZone: "Asia/Kolkata" })
+        .replace(" ", "T");
+
+      const payload = finalAttendance.map((record) => ({
+        studentId: record.studentId,
+        courseId: selectedCourseId,
+        date: formattedDate,
+        status: record.status, // "PRESENT" or "ABSENT"
+      }));
+
+      const response = await axios.post("/api/upsertAttendance", payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.data.success) {
         toast("Successfully uploaded data to database");
       } else {
         console.error("Upload failed:", response.data.error);
+        toast("Upload failed.");
       }
     } catch (error) {
       console.error("Error in upserting attendance:", error);
+      toast("Error occurred while uploading attendance");
     } finally {
       setIsProcessing(false);
       setAttendanceStatus("DBuploaded");

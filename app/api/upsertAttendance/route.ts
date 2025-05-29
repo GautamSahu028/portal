@@ -1,60 +1,59 @@
-// app/api/upsertAttendance/route.ts (App Router - Next.js 13+)
 import db from "@/utils/db";
-import { AttendanceOutput } from "@/utils/types";
 import { NextResponse } from "next/server";
+
 export async function POST(req: Request) {
   try {
-    const finalAttendance: AttendanceOutput[] = await req.json();
+    const body = await req.json();
 
-    for (const record of finalAttendance) {
-      const existing = await db.attendance.findUnique({
-        where: {
-          studentId_courseId_date: {
-            studentId: record.studentId,
-            courseId: record.courseId,
-            date: new Date(record.date),
-          },
-        },
-      });
-
-      if (existing) {
-        await db.attendance.update({
-          where: {
-            studentId_courseId_date: {
-              studentId: record.studentId,
-              courseId: record.courseId,
-              date: new Date(record.date),
-            },
-          },
-          data: {
-            status: record.status,
-            totalClassesTillDate: { increment: 1 },
-            totalPresentTillDate:
-              record.status === "PRESENT" ? { increment: 1 } : undefined,
-          },
-        });
-      } else {
-        await db.attendance.create({
-          data: {
-            studentId: record.studentId,
-            courseId: record.courseId,
-            date: new Date(record.date),
-            status: record.status,
-            totalClassesTillDate: 1,
-            totalPresentTillDate: record.status === "PRESENT" ? 1 : 0,
-          },
-        });
-      }
+    if (!Array.isArray(body)) {
+      return NextResponse.json(
+        { success: false, error: "Invalid data format: expected an array." },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Error inserting attendance:", error);
+    const results = await Promise.all(
+      body.map(async (record) => {
+        const { studentId, courseId, date, status } = record;
+
+        if (!studentId || !courseId || !date || !status) {
+          return { error: "Missing required fields in record", record };
+        }
+
+        return await db.attendance.upsert({
+          where: {
+            studentId_courseId_date: {
+              studentId,
+              courseId,
+              date: new Date(date),
+            },
+          },
+          update: {
+            status,
+          },
+          create: {
+            studentId,
+            courseId,
+            date: new Date(date),
+            status,
+          },
+        });
+      })
+    );
+
+    const errors = results.filter((r: any) => r?.error);
+    if (errors.length > 0) {
+      return NextResponse.json(
+        { success: false, error: "Some records failed", details: errors },
+        { status: 207 }
+      );
+    }
+
+    return NextResponse.json({ success: true, message: "Attendance upserted" });
+  } catch (err) {
+    console.error("API Error:", err);
     return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }

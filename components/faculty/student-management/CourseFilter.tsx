@@ -27,11 +27,7 @@ export function CourseFilter({ courses, selectedCourse }: CourseFilterProps) {
   const handleCourseChange = (courseId: string) => {
     const params = new URLSearchParams(searchParams);
 
-    if (courseId === "all") {
-      params.delete("course");
-    } else {
-      params.set("course", courseId);
-    }
+    params.set("course", courseId);
 
     const queryString = params.toString();
     const newUrl = queryString ? `?${queryString}` : "";
@@ -40,12 +36,11 @@ export function CourseFilter({ courses, selectedCourse }: CourseFilterProps) {
   };
 
   return (
-    <Select value={selectedCourse || "all"} onValueChange={handleCourseChange}>
+    <Select value={selectedCourse} onValueChange={handleCourseChange}>
       <SelectTrigger className="w-full sm:w-[250px]">
-        <SelectValue placeholder="All Courses" />
+        <SelectValue placeholder="Select a course" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="all">All Courses</SelectItem>
         {courses.map((course) => (
           <SelectItem key={course.id} value={course.id}>
             {course.code} - {course.name}

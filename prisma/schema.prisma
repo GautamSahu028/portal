@@ -81,37 +81,22 @@ model StudentCourse {
 }
 
 model Attendance {
-  id                    String            @id @default(uuid())
-  studentId             String
-  courseId              String
-  date                  DateTime
-  status                AttendanceStatus
-  totalClassesTillDate  Int               @default(1)
-  totalPresentTillDate  Int               @default(0)
+  id        String   @id @default(uuid())
+  studentId String
+  courseId  String
+  date      DateTime
+  status    AttendanceStatus
 
   student   Student  @relation(fields: [studentId], references: [id])
   course    Course   @relation(fields: [courseId], references: [id])
 
-  @@unique([studentId, courseId, date]) // optional but recommended for upsert logic
+  @@unique([studentId, courseId, date])
 }
-
 
 enum AttendanceStatus {
   PRESENT
   ABSENT
 }
-
-
-// model Grade {
-//   id        String   @id @default(uuid())
-//   studentId String
-//   courseId  String
-//   title     String
-//   score     Float
-
-//   student   Student  @relation(fields: [studentId], references: [id])
-//   course    Course   @relation(fields: [courseId], references: [id])
-// }
 
 model Semester {
   id          String           @id @default(uuid())

@@ -467,3 +467,86 @@ export async function getCourseWithStats(courseId: string) {
     };
   }
 }
+
+export const getAttendanceByCourseId = async (courseId: string) => {
+  try {
+    const attendanceRecords = await db.attendance.findMany({
+      where: { courseId },
+      include: {
+        student: {
+          include: {
+            user: true,
+          },
+        },
+        course: true,
+      },
+      orderBy: {
+        date: "desc",
+      },
+    });
+
+    const grouped = new Map<
+      string,
+      {
+        roll: string;
+        name: string;
+        course: string;
+        semester: number;
+        totalPresent: number;
+        totalClasses: number;
+        lastStatus: string;
+        lastDate: Date;
+      }
+    >();
+
+    for (const record of attendanceRecords) {
+      const studentId = record.studentId;
+
+      if (!grouped.has(studentId)) {
+        grouped.set(studentId, {
+          roll: record.student.rollNumber,
+          name: record.student.user.name,
+          course: record.course.name,
+          semester: record.student.currentSemester,
+          totalPresent: 0,
+          totalClasses: 0,
+          lastStatus: record.status,
+          lastDate: record.date,
+        });
+      }
+
+      const entry = grouped.get(studentId)!;
+
+      entry.totalClasses += 1;
+      if (record.status === "PRESENT") {
+        entry.totalPresent += 1;
+      }
+
+      if (record.date > entry.lastDate) {
+        entry.lastStatus = record.status;
+        entry.lastDate = record.date;
+      }
+    }
+
+    const finalData = Array.from(grouped.values()).map((student) => ({
+      roll: student.roll,
+      name: student.name,
+      course: student.course,
+      semester: student.semester,
+      percentage:
+        student.totalClasses > 0
+          ? ((student.totalPresent / student.totalClasses) * 100).toFixed(2)
+          : "0.00",
+      lastStatus: student.lastStatus,
+      lastDate: student.lastDate.toISOString(),
+    }));
+
+    return { success: true, data: finalData };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
+  }
+};

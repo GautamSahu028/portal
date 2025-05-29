@@ -34,7 +34,7 @@ export default async function SignIn() {
         {/* Footer Link */}
         <div className="text-center mt-6">
           <p className="text-blue-100 text-sm">
-            Don't have an account?{" "}
+            No account?{" "}
             <Link
               href="/sign-up"
               className="text-white font-semibold hover:text-blue-200 transition-colors"

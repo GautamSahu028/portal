@@ -1,6 +1,4 @@
 import React from "react";
-import { Button } from "../ui/button";
-import { getCourse } from "@/utils/actions";
 import { AttendanceRecord } from "@/utils/types";
 
 interface AttendanceTableProps {

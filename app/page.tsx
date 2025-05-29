@@ -1,13 +1,5 @@
 import { LogOutButton } from "@/auth/nextjs/components/LogOutButton";
 import { getCurrentUser } from "@/auth/nextjs/currentUser";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Bell,
   BookOpen,
@@ -16,7 +8,6 @@ import {
   Layers,
   Users,
   MessageCircle,
-  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { LoadingButton } from "@/components/Buttons/LoadingButton";
