@@ -9,7 +9,7 @@ interface AttendanceResultsProps {
 function AttendanceResults({ results }: AttendanceResultsProps) {
   return (
     <div>
-      <h3 className="text-lg font-medium mb-4 text-gray-200">
+      <h3 className="text-lg font-medium mb-4 text-foreground">
         Attendance Results
       </h3>
       <AttendanceTable results={results} />

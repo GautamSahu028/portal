@@ -186,52 +186,55 @@ function CameraComponent({ onCapture, onClose }: CameraComponentProps) {
   }
 
   return (
-    <div className="border rounded-lg p-6 bg-white shadow-sm">
+    <div className="border border-border rounded-xl bg-muted p-6 shadow-sm">
+      {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Camera</h2>
-        <div className="flex space-x-2">
+        <h2 className="text-xl font-semibold text-foreground">Camera</h2>
+        <div className="flex gap-2">
           <button
             onClick={handleCapture}
             disabled={!isReady}
-            className={`px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 ${
               isReady
-                ? "bg-blue-600 text-white hover:bg-blue-700"
-                : "bg-blue-300 text-white cursor-not-allowed"
+                ? "bg-primary text-white hover:bg-primary/90 focus:ring-primary"
+                : "bg-muted text-muted-foreground cursor-not-allowed"
             }`}
           >
             {isReady ? "Capture" : "Initializing..."}
           </button>
           <button
             onClick={handleClose}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-destructive text-white hover:bg-destructive/90 focus:outline-none focus:ring-2 focus:ring-destructive"
           >
             Cancel
           </button>
         </div>
       </div>
 
+      {/* Error Message */}
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="mb-4 bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm">
           {error}
         </div>
       )}
 
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50 flex justify-center">
+      {/* Camera View */}
+      <div className="overflow-hidden rounded-lg border border-border bg-background flex justify-center">
         <video
           ref={videoRef}
           autoPlay
           playsInline
           muted
-          className="max-w-full max-h-[500px]"
+          className="w-full max-h-[500px] object-contain rounded"
         />
       </div>
 
-      {/* Hidden canvas for capturing */}
       <canvas ref={canvasRef} className="hidden" />
 
+      {/* Loading Indicator */}
       {!isReady && !error && (
-        <div className="mt-4 text-center text-gray-600">
-          <div className="inline-block animate-spin mr-2">⟳</div>
+        <div className="mt-4 text-center text-muted-foreground text-sm flex justify-center items-center gap-2">
+          <div className="w-4 h-4 border-2 border-t-transparent border-gray-400 rounded-full animate-spin"></div>
           Initializing camera...
         </div>
       )}

@@ -9,40 +9,40 @@ import {
 
 export const getFacultyNavItems = () => [
   {
-    title: "Dashboard",
+    title: "Profile",
     href: "/faculty/dashboard",
     icon: <GraduationCap className="h-5 w-5" />,
   },
   {
-    title: "Students",
+    title: "Attendance Management",
     href: "/faculty/manage-students",
     icon: <Users className="h-5 w-5" />,
   },
   {
-    title: "Attendance",
+    title: "Attendance System",
     href: "/faculty/attendance",
     icon: <Calendar className="h-5 w-5" />,
   },
-  {
-    title: "Grades",
-    href: "/faculty/grades",
-    icon: <BookOpen className="h-5 w-5" />,
-  },
-  {
-    title: "Courses",
-    href: "/faculty/courses",
-    icon: <BookOpen className="h-5 w-5" />,
-  },
-  {
-    title: "Announcements",
-    href: "/faculty/announcements",
-    icon: <Bell className="h-5 w-5" />,
-  },
-  {
-    title: "Messages",
-    href: "/faculty/messages",
-    icon: <MessageSquare className="h-5 w-5" />,
-  },
+  // {
+  //   title: "Grades",
+  //   href: "/faculty/grades",
+  //   icon: <BookOpen className="h-5 w-5" />,
+  // },
+  // {
+  //   title: "Courses",
+  //   href: "/faculty/courses",
+  //   icon: <BookOpen className="h-5 w-5" />,
+  // },
+  // {
+  //   title: "Announcements",
+  //   href: "/faculty/announcements",
+  //   icon: <Bell className="h-5 w-5" />,
+  // },
+  // {
+  //   title: "Messages",
+  //   href: "/faculty/messages",
+  //   icon: <MessageSquare className="h-5 w-5" />,
+  // },
 ];
 
 export const getStudentNavItems = () => [

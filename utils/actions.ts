@@ -488,6 +488,8 @@ export const getAttendanceByCourseId = async (courseId: string) => {
     const grouped = new Map<
       string,
       {
+        studentId: string;
+        courseId: string;
         roll: string;
         name: string;
         course: string;
@@ -504,6 +506,8 @@ export const getAttendanceByCourseId = async (courseId: string) => {
 
       if (!grouped.has(studentId)) {
         grouped.set(studentId, {
+          studentId: record.studentId,
+          courseId: record.courseId,
           roll: record.student.rollNumber,
           name: record.student.user.name,
           course: record.course.name,
@@ -528,18 +532,22 @@ export const getAttendanceByCourseId = async (courseId: string) => {
       }
     }
 
-    const finalData = Array.from(grouped.values()).map((student) => ({
-      roll: student.roll,
-      name: student.name,
-      course: student.course,
-      semester: student.semester,
-      percentage:
-        student.totalClasses > 0
-          ? ((student.totalPresent / student.totalClasses) * 100).toFixed(2)
-          : "0.00",
-      lastStatus: student.lastStatus,
-      lastDate: student.lastDate.toISOString(),
-    }));
+    const finalData = Array.from(grouped.values())
+      .sort((a, b) => a.roll.localeCompare(b.roll))
+      .map((student) => ({
+        studentId: student.studentId,
+        courseId: student.courseId,
+        roll: student.roll,
+        name: student.name,
+        course: student.course,
+        semester: student.semester,
+        percentage:
+          student.totalClasses > 0
+            ? ((student.totalPresent / student.totalClasses) * 100).toFixed(2)
+            : "0.00",
+        lastStatus: student.lastStatus,
+        lastDate: student.lastDate.toISOString(),
+      }));
 
     return { success: true, data: finalData };
   } catch (error) {
@@ -550,3 +558,34 @@ export const getAttendanceByCourseId = async (courseId: string) => {
     };
   }
 };
+
+export async function getFacultyProfile() {
+  const currentUser = await getCurrentUser();
+  if (!currentUser || currentUser.role !== "FACULTY") {
+    throw new Error("Unauthorized or invalid role");
+  }
+
+  const faculty = await db.faculty.findUnique({
+    where: { userId: currentUser.id },
+    include: {
+      user: true,
+      courses: true,
+      announcements: {
+        orderBy: { postedAt: "desc" },
+        take: 5,
+      },
+    },
+  });
+
+  if (!faculty) throw new Error("Faculty not found");
+
+  return {
+    name: faculty.user.name,
+    email: faculty.user.email,
+    department: faculty.department,
+    designation: faculty.designation,
+    employeeId: faculty.employeeId,
+    courses: faculty.courses,
+    announcements: faculty.announcements,
+  };
+}

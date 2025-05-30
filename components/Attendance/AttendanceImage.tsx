@@ -136,20 +136,17 @@ const AttendanceImage: React.FC<AttendanceImageProps> = ({
 
   return (
     <div className="space-y-6 min-w-0">
-      {/* Image Preview Container */}
-      <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-6 shadow-xl overflow-hidden">
+      <div className="bg-muted rounded-2xl border border-border p-6 shadow-md overflow-hidden">
         <div className="relative group w-full">
-          {/* Image Container with proper constraints */}
-          <div className="w-full max-w-full overflow-hidden rounded-xl">
+          <div className="w-full overflow-hidden rounded-xl">
             <img
               src={imagePreview}
               alt="Attendance"
-              className="w-full h-auto max-h-80 sm:max-h-96 lg:max-h-[32rem] object-contain rounded-xl shadow-lg border border-slate-600/50 transition-transform duration-300 group-hover:scale-[1.02]"
+              className="w-full h-auto max-h-96 object-contain rounded-xl shadow-sm border border-border transition-transform group-hover:scale-[1.02]"
             />
           </div>
 
-          {/* Image Overlay Info */}
-          <div className="absolute top-4 right-4 bg-slate-900/80 backdrop-blur-sm text-white px-3 py-1 rounded-lg border border-slate-600/50">
+          <div className="absolute top-4 right-4 bg-popover text-foreground px-3 py-1 rounded-md border border-border shadow-sm">
             <span className="text-xs font-medium">
               {uploadedImage.type.split("/")[1]?.toUpperCase()}
             </span>
@@ -158,24 +155,12 @@ const AttendanceImage: React.FC<AttendanceImageProps> = ({
       </div>
 
       {/* Image Details */}
-      <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-6 shadow-xl">
+      <div className="bg-muted rounded-2xl border border-border p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-6">
-          <div className="bg-green-500/20 rounded-lg p-2 border border-green-500/30 flex-shrink-0">
-            <svg
-              className="w-5 h-5 text-green-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
+          <div className="bg-green-100 dark:bg-green-500/20 border border-green-300 dark:border-green-500/30 rounded-lg p-2 flex-shrink-0">
+            <svg className="w-5 h-5 text-green-600 dark:text-green-400" />
           </div>
-          <h4 className="text-lg font-semibold text-white truncate">
+          <h4 className="text-lg font-semibold text-foreground truncate">
             File Information
           </h4>
         </div>
@@ -184,27 +169,24 @@ const AttendanceImage: React.FC<AttendanceImageProps> = ({
           {detailItems.map((item, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-4 bg-slate-700/40 backdrop-blur-sm rounded-xl border border-slate-600/50 hover:border-slate-500/50 transition-all duration-300 hover:bg-slate-700/60 group min-w-0"
+              className="flex items-center justify-between p-4 bg-background border border-border rounded-xl hover:shadow-sm"
             >
-              <div className="flex items-center gap-3 min-w-0 flex-shrink-0">
-                <div className="text-slate-400 group-hover:text-slate-300 transition-colors duration-300 flex-shrink-0">
-                  {item.icon}
-                </div>
-                <span className="font-medium text-slate-300 group-hover:text-white transition-colors duration-300 whitespace-nowrap">
+              <div className="flex items-center gap-3">
+                <div className="text-muted-foreground">{item.icon}</div>
+                <span className="font-medium text-foreground">
                   {item.label}:
                 </span>
               </div>
-              <span className="text-white font-medium text-right break-words max-w-[60%] min-w-0 overflow-wrap-anywhere">
+              <span className="text-right text-muted-foreground max-w-[60%] break-words">
                 {item.value}
               </span>
             </div>
           ))}
         </div>
 
-        {/* Status Indicator */}
         <div className="mt-6 flex items-center justify-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-300 rounded-full border border-green-500/30 backdrop-blur-sm">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-300 rounded-full border border-green-300 dark:border-green-500/30">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <span className="text-sm font-medium">Upload Successful</span>
           </div>
         </div>

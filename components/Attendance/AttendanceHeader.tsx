@@ -45,7 +45,7 @@ const AttendanceHeader: React.FC<AttendanceHeaderProps> = ({
           {getButtonLabel()}
         </Button>
       </div>
-      <p className="text-gray-600 mt-2">{getTodayDate()}</p>
+      <p className="text-foreground mt-2">{getTodayDate()}</p>
     </div>
   );
 };

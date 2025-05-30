@@ -1,52 +1,40 @@
 import React from "react";
+import { cn } from "@/lib/utils";
 
 interface StatusMessageProps {
-  status: string;
+  status: "uploaded" | "processed" | "DBuploaded" | null;
   getTodayDate: () => string;
 }
 
-const StatusMessage: React.FC<StatusMessageProps> = ({
+export const StatusMessage: React.FC<StatusMessageProps> = ({
   status,
   getTodayDate,
 }) => {
-  switch (status) {
-    case "uploaded":
-      return (
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 mb-4">
-          <div className="flex items-center">
-            <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
-            <p className="text-slate-300 text-sm">
-              Image successfully uploaded. Click "Generate Report" to process
-              attendance.
-            </p>
-          </div>
-        </div>
-      );
-    case "processed":
-      return (
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 mb-4">
-          <div className="flex items-center">
-            <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-            <p className="text-slate-300 text-sm">
-              Attendance successfully recorded for {getTodayDate()}
-            </p>
-          </div>
-        </div>
-      );
-    case "DBuploaded":
-      return (
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 mb-4">
-          <div className="flex items-center">
-            <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
-            <p className="text-slate-300 text-sm">
-              Attendance successfully uploaded for {getTodayDate()}
-            </p>
-          </div>
-        </div>
-      );
-    default:
-      return null;
-  }
-};
+  if (!status) return null;
 
-export default StatusMessage;
+  const config = {
+    uploaded: {
+      color: "bg-blue-400",
+      message: `Image successfully uploaded. Click "Generate Report" to process attendance.`,
+    },
+    processed: {
+      color: "bg-green-400",
+      message: `Attendance successfully recorded for ${getTodayDate()}`,
+    },
+    DBuploaded: {
+      color: "bg-green-400",
+      message: `Attendance successfully uploaded for ${getTodayDate()}`,
+    },
+  };
+
+  const { color, message } = config[status];
+
+  return (
+    <div className="bg-muted border border-border rounded-lg p-4 mb-4 shadow-sm">
+      <div className="flex items-center">
+        <span className={cn("w-2 h-2 rounded-full mr-3", color)} />
+        <p className="text-sm text-muted-foreground">{message}</p>
+      </div>
+    </div>
+  );
+};

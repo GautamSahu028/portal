@@ -8,7 +8,6 @@ import AttendanceHeader from "./AttendanceHeader";
 import AttendanceImage from "./AttendanceImage";
 import AttendanceResults from "./AttendanceResults";
 import EmptyState from "./EmptyState";
-import StatusMessage from "./StatusMessage";
 import CameraComponent from "./CameraComponent";
 import axios from "axios";
 import {
@@ -22,12 +21,15 @@ import {
   parseAttendanceData,
 } from "./utils/utilityFunctions";
 import { toast } from "sonner";
+import { StatusMessage } from "./StatusMessage";
 
 function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [attendanceStatus, setAttendanceStatus] = useState("none"); // "none", "uploaded", "processed"
+  const [attendanceStatus, setAttendanceStatus] = useState<
+    "uploaded" | "processed" | "DBuploaded" | null
+  >(null); // "uploaded", "processed", "DBuploaded", or null
   const [fullAttendanceRecords, setFullAttendanceRecords] = useState<
     AttendanceRecord[]
   >([]);
@@ -222,7 +224,7 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
   );
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="p-6 space-y-6">
         <AttendanceHeader
           getTodayDate={getTodayDate}
@@ -235,11 +237,11 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
         />
 
         {/* Course Selection Card */}
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-6">
+        <div className="bg-muted rounded-2xl border border-border p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-500/20 rounded-lg flex items-center justify-center">
               <svg
-                className="w-4 h-4 text-blue-400"
+                className="w-4 h-4 text-blue-600 dark:text-blue-400"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -247,10 +249,10 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
               </svg>
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-white">
+              <h2 className="text-xl font-semibold text-foreground">
                 Select Course
               </h2>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-muted-foreground">
                 Choose the course for attendance tracking
               </p>
             </div>
@@ -260,7 +262,7 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
             <div>
               <label
                 htmlFor="course-select"
-                className="block text-sm font-medium text-slate-300 mb-2"
+                className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 Course Selection
               </label>
@@ -268,15 +270,11 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
                 id="course-select"
                 value={selectedCourseId}
                 onChange={(e) => handleCourseSelect(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                className="w-full px-4 py-2.5 bg-background border border-border rounded-md text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
               >
                 <option value="">-- Select a Course --</option>
                 {courses.map((course) => (
-                  <option
-                    key={course.id}
-                    value={course.id}
-                    className="bg-slate-700"
-                  >
+                  <option key={course.id} value={course.id}>
                     {course.code} - {course.name} (
                     {course.enrolledStudentsCount} students)
                   </option>
@@ -284,12 +282,11 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
               </select>
             </div>
 
-            {/* Course Selection Error */}
             {courseSelectionError && (
-              <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+              <div className="flex items-start gap-3 p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
                 <div className="flex-shrink-0">
                   <svg
-                    className="w-5 h-5 text-red-400 mt-0.5"
+                    className="w-5 h-5 text-destructive mt-0.5"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -300,18 +297,17 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
                     />
                   </svg>
                 </div>
-                <p className="text-sm font-medium text-red-300">
+                <p className="text-sm font-medium text-destructive-foreground">
                   {courseSelectionError}
                 </p>
               </div>
             )}
 
-            {/* Selected Course Info */}
             {selectedCourse && (
-              <div className="flex items-start gap-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+              <div className="flex items-start gap-3 p-4 bg-blue-100 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl">
                 <div className="flex-shrink-0">
                   <svg
-                    className="w-5 h-5 text-blue-400 mt-0.5"
+                    className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -323,11 +319,11 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-blue-300">
-                    Selected Course: {selectedCourse.code} -{" "}
+                  <h3 className="text-sm font-medium text-blue-600 dark:text-blue-300">
+                    Selected Course: {selectedCourse.code} –{" "}
                     {selectedCourse.name}
                   </h3>
-                  <p className="text-sm text-blue-400 mt-1">
+                  <p className="text-sm text-blue-500 dark:text-blue-400 mt-1">
                     Enrolled Students: {selectedCourse.enrolledStudentsCount}
                     {selectedCourse.description && (
                       <span className="ml-2">
@@ -355,7 +351,7 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
 
         {/* Camera Component */}
         {isCameraOpen && (
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden">
+          <div className="bg-muted backdrop-blur-sm rounded-2xl border border-border overflow-hidden">
             <CameraComponent
               onCapture={handleCameraCapture}
               onClose={handleCameraClose}
@@ -365,7 +361,7 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
 
         {/* Image Upload and Results Section */}
         {uploadedImage && imagePreview && !isCameraOpen && (
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-6">
+          <div className="bg-muted backdrop-blur-sm rounded-2xl border border-border p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
                 <svg
@@ -381,10 +377,10 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
                 </svg>
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-white">
+                <h2 className="text-xl font-semibold text-foreground">
                   Attendance Processing
                 </h2>
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-muted-foreground">
                   Review uploaded image and attendance results
                 </p>
               </div>
@@ -401,7 +397,7 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
 
               <div className="space-y-6 min-w-0">
                 <div>
-                  <h3 className="text-lg font-medium text-white mb-3">
+                  <h3 className="text-lg font-medium text-foreground mb-3">
                     Processing Status
                   </h3>
                   <StatusMessage
@@ -424,7 +420,7 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
 
         {/* Empty State */}
         {!uploadedImage && !isCameraOpen && !error && (
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 relative overflow-hidden">
+          <div className="bg-muted backdrop-blur-sm rounded-2xl border border-border relative overflow-hidden">
             {/* Camera Button */}
             <div className="flex items-center justify-end p-4 mr-4">
               {/* Camera Button - Now in header for better alignment */}
