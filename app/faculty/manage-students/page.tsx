@@ -30,12 +30,14 @@ export default async function FacultyStudentsPage({
 
   const attendanceResult = await getAttendanceByCourseId(selectedCourseId);
   const attendanceData = attendanceResult.success ? attendanceResult.data : [];
+  // console.log(attendanceData);
 
+  // const filteredData: string | any[] = [];
   const filteredData = selectedDate
     ? attendanceData?.filter((entry: any) => {
         try {
-          if (!entry.lastDate) return false;
-          const dateObj = new Date(entry.lastDate);
+          if (!entry.date) return false; // ✅ Use 'date' instead of 'lastDate'
+          const dateObj = new Date(entry.date);
           if (isNaN(dateObj.getTime())) return false;
 
           const entryDate = dateObj.toLocaleDateString("en-CA");
@@ -45,6 +47,12 @@ export default async function FacultyStudentsPage({
         }
       })
     : attendanceData;
+
+  const sortedData = filteredData?.sort((a, b) => {
+    const rollA = parseInt(a.roll) || 0;
+    const rollB = parseInt(b.roll) || 0;
+    return rollA - rollB;
+  });
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -96,7 +104,7 @@ export default async function FacultyStudentsPage({
                     <TableHead className="text-center">Action</TableHead>
                   </TableRow>
                 </TableHeader>
-                <EditableAttendanceTable data={filteredData || []} />
+                <EditableAttendanceTable data={sortedData || []} />
               </Table>
             )}
           </CardContent>

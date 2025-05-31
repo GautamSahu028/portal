@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { CourseFilter } from "@/components/faculty/student-management/CourseFilter";
 import { useState } from "react";
 import { DatePicker } from "./DatePicker";
+import { format } from "date-fns";
 
 export default function FilterControls({
   selectedCourseId,
@@ -22,18 +23,19 @@ export default function FilterControls({
   );
 
   const handleDateChange = (newDate: Date) => {
+    // 1️⃣ Update local state if needed:
+    setDate(newDate);
+
+    // 2️⃣ Copy over existing search params
     const params = new URLSearchParams(searchParams.toString());
     params.set("course", selectedCourseId);
 
-    // Normalize to local date in yyyy-mm-dd format
-    const localDate = new Date(
-      newDate.getFullYear(),
-      newDate.getMonth(),
-      newDate.getDate()
-    );
-
-    const formatted = localDate.toISOString().split("T")[0]; // 'YYYY-MM-DD'
+    // 3️⃣ Format the newDate in local timezone as 'yyyy-MM-dd'
+    //    This will **not** shift backwards by UTC offset
+    const formatted = format(newDate, "yyyy-MM-dd");
     params.set("date", formatted);
+
+    // 4️⃣ Push new URL
     router.push(`?${params.toString()}`);
   };
 

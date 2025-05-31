@@ -62,3 +62,15 @@ export type AttendanceOutput = {
   date: Date;
   status: "PRESENT" | "ABSENT";
 };
+
+export interface AttendanceByDateItem {
+  studentId: string;
+  courseId: string;
+  roll: string;
+  name: string;
+  course: string;
+  semester: number;
+  percentage: string; // e.g. "87.50%"
+  status: string; // "PRESENT" or "ABSENT"
+  date: string; // ISO string for the attendance date
+}

@@ -1,6 +1,6 @@
 import db from "@/utils/db";
 import { getCurrentUser } from "@/auth/nextjs/currentUser";
-import { AttendanceOutput, FacultyCourse } from "./types";
+import { AttendanceByDateItem, AttendanceOutput, FacultyCourse } from "./types";
 
 export async function getStudentsByFaculty() {
   try {
@@ -468,86 +468,66 @@ export async function getCourseWithStats(courseId: string) {
   }
 }
 
-export const getAttendanceByCourseId = async (courseId: string) => {
+export const getAttendanceByCourseId = async (
+  courseId: string
+): Promise<
+  | { success: true; data: AttendanceByDateItem[] }
+  | { success: false; error: string }
+> => {
   try {
+    // 1) Fetch all attendance rows for this course, in ASCENDING date order:
     const attendanceRecords = await db.attendance.findMany({
       where: { courseId },
       include: {
         student: {
-          include: {
-            user: true,
-          },
+          include: { user: true },
         },
         course: true,
       },
-      orderBy: {
-        date: "desc",
-      },
+      orderBy: { date: "asc" },
     });
 
-    const grouped = new Map<
+    // 2) Prepare a Map to track, for each studentId, how many records we've seen so far
+    //    and how many of those were PRESENT.
+    const perStudentTotals = new Map<
       string,
-      {
-        studentId: string;
-        courseId: string;
-        roll: string;
-        name: string;
-        course: string;
-        semester: number;
-        totalPresent: number;
-        totalClasses: number;
-        lastStatus: string;
-        lastDate: Date;
-      }
+      { seen: number; present: number }
     >();
 
-    for (const record of attendanceRecords) {
-      const studentId = record.studentId;
-
-      if (!grouped.has(studentId)) {
-        grouped.set(studentId, {
-          studentId: record.studentId,
-          courseId: record.courseId,
-          roll: record.student.rollNumber,
-          name: record.student.user.name,
-          course: record.course.name,
-          semester: record.student.currentSemester,
-          totalPresent: 0,
-          totalClasses: 0,
-          lastStatus: record.status,
-          lastDate: record.date,
-        });
+    // 3) Build the AttendanceByDateItem[] in ascending‐date order, calculating "running %"
+    const itemsAsc: AttendanceByDateItem[] = attendanceRecords.map((r) => {
+      const sid = r.studentId;
+      if (!perStudentTotals.has(sid)) {
+        perStudentTotals.set(sid, { seen: 0, present: 0 });
       }
 
-      const entry = grouped.get(studentId)!;
-
-      entry.totalClasses += 1;
-      if (record.status === "PRESENT") {
-        entry.totalPresent += 1;
+      const totals = perStudentTotals.get(sid)!;
+      totals.seen += 1;
+      if (r.status === "PRESENT") {
+        totals.present += 1;
       }
 
-      if (record.date > entry.lastDate) {
-        entry.lastStatus = record.status;
-        entry.lastDate = record.date;
-      }
-    }
+      // Compute running percentage up to _this_ row:
+      const pctSoFar =
+        totals.seen > 0
+          ? ((totals.present / totals.seen) * 100).toFixed(2)
+          : "0.00";
 
-    const finalData = Array.from(grouped.values())
-      .sort((a, b) => a.roll.localeCompare(b.roll))
-      .map((student) => ({
-        studentId: student.studentId,
-        courseId: student.courseId,
-        roll: student.roll,
-        name: student.name,
-        course: student.course,
-        semester: student.semester,
-        percentage:
-          student.totalClasses > 0
-            ? ((student.totalPresent / student.totalClasses) * 100).toFixed(2)
-            : "0.00",
-        lastStatus: student.lastStatus,
-        lastDate: student.lastDate.toISOString(),
-      }));
+      return {
+        studentId: r.studentId,
+        courseId: r.courseId,
+        roll: r.student.rollNumber,
+        name: r.student.user.name,
+        course: r.course.name,
+        semester: r.student.currentSemester,
+        percentage: pctSoFar,
+        status: r.status as "PRESENT" | "ABSENT",
+        date: r.date.toISOString(),
+      };
+    });
+
+    // 4) Reverse so that the most recent date is first
+    const finalData = itemsAsc.reverse();
 
     return { success: true, data: finalData };
   } catch (error) {
@@ -558,6 +538,129 @@ export const getAttendanceByCourseId = async (courseId: string) => {
     };
   }
 };
+
+export async function getAttendanceByDate(
+  dateString: string
+): Promise<
+  | { success: true; data: AttendanceByDateItem[] }
+  | { success: false; error: string }
+> {
+  try {
+    // 1. Authentication & Role Check (optional: only FACULTY can view)
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      throw new Error("User not authenticated");
+    }
+    if (currentUser.role !== "FACULTY") {
+      throw new Error(
+        "Access denied. Only faculty members can view attendance."
+      );
+    }
+
+    // 2. Parse the incoming date
+    //    We treat dateString as "YYYY-MM-DD".
+    const dayStart = new Date(dateString);
+    dayStart.setUTCHours(0, 0, 0, 0);
+
+    //    dayEnd = the very start of the *next* UTC day:
+    const dayEnd = new Date(dayStart);
+    dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+    dayEnd.setUTCHours(0, 0, 0, 0);
+
+    // 3. Fetch every Attendance record whose `date` is >= dayStart AND < dayEnd
+    //    Include student → user (to get `name`) and the student’s `rollNumber` & `currentSemester`
+    //    Also include course → name.
+    const todayRecords = await db.attendance.findMany({
+      where: {
+        date: {
+          gte: dayStart,
+          lt: dayEnd,
+        },
+      },
+      include: {
+        student: {
+          select: {
+            id: true,
+            rollNumber: true,
+            currentSemester: true,
+            user: {
+              select: { name: true },
+            },
+          },
+        },
+        course: {
+          select: { id: true, name: true },
+        },
+      },
+      orderBy: {
+        // (optional) sort by course name, then student roll
+        course: { name: "asc" },
+        student: { rollNumber: "asc" },
+      },
+    });
+
+    // 4. For each attendance record, compute the cumulative attendance percentage up to `dayEnd`:
+    //    - totalCount = # of attendance rows for that studentId & courseId where date <= dayEnd
+    //    - presentCount = same filter + status = PRESENT
+    //
+    //    We do a small loop and run two `count()` calls per record. If you have many records,
+    //    you could optimize by batching or grouping first, but this is O(N) where N = number of records today.
+    const formatted: AttendanceByDateItem[] = [];
+    for (const rec of todayRecords) {
+      const sid = rec.studentId;
+      const cid = rec.courseId;
+      const cutoff = dayEnd; // <= dayEnd (so includes all records on the given day)
+
+      // 4a. Count how many attendance rows exist *up to and including* the target date:
+      const totalCount = await db.attendance.count({
+        where: {
+          studentId: sid,
+          courseId: cid,
+          date: { lte: cutoff },
+        },
+      });
+
+      // 4b. Count how many of those have status = PRESENT:
+      const presentCount = await db.attendance.count({
+        where: {
+          studentId: sid,
+          courseId: cid,
+          date: { lte: cutoff },
+          status: "PRESENT",
+        },
+      });
+
+      // 4c. Compute percentage string (two decimals):
+      //     If there is no historical attendance (shouldn’t happen if today’s record exists),
+      //     we guard against division-by-zero.
+      let percentStr = "0.00%";
+      if (totalCount > 0) {
+        const pct = (presentCount / totalCount) * 100;
+        percentStr = pct.toFixed(2) + "%";
+      }
+
+      formatted.push({
+        studentId: rec.studentId,
+        courseId: rec.courseId,
+        roll: rec.student.rollNumber,
+        name: rec.student.user.name,
+        course: rec.course.name,
+        semester: rec.student.currentSemester,
+        percentage: percentStr,
+        status: rec.status, // "PRESENT" or "ABSENT"
+        date: rec.date.toISOString(), // ISO string of the actual attendance timestamp
+      });
+    }
+
+    return { success: true, data: formatted };
+  } catch (error) {
+    console.error("Error in getAttendanceByDate:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unexpected error",
+    };
+  }
+}
 
 export async function getFacultyProfile() {
   const currentUser = await getCurrentUser();

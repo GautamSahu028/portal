@@ -28,7 +28,7 @@ export default function EditableAttendanceTable({ data }: { data: any[] }) {
 
   const handleEdit = (entry: any) => {
     setSelectedEntry(entry);
-    setStatus(entry.lastStatus);
+    setStatus(entry.status);
     setIsOpen(true);
   };
 
@@ -40,7 +40,7 @@ export default function EditableAttendanceTable({ data }: { data: any[] }) {
       await axios.post("/api/updateAttendance", {
         studentId: selectedEntry.studentId,
         courseId: selectedEntry.courseId,
-        date: selectedEntry.lastDate,
+        date: selectedEntry.date,
         status,
       });
       setIsOpen(false);
@@ -66,17 +66,15 @@ export default function EditableAttendanceTable({ data }: { data: any[] }) {
             <TableCell>{entry.semester}</TableCell>
             <TableCell
               className={
-                entry.lastStatus === "PRESENT"
-                  ? "text-green-500"
-                  : "text-red-500"
+                entry.status === "PRESENT" ? "text-green-500" : "text-red-500"
               }
             >
-              {entry.lastStatus}
+              {entry.status}
             </TableCell>
             <TableCell>{entry.percentage}%</TableCell>
             <TableCell>
-              {entry.lastDate
-                ? new Date(entry.lastDate).toLocaleDateString("en-IN", {
+              {entry.date
+                ? new Date(entry.date).toLocaleDateString("en-IN", {
                     day: "2-digit",
                     month: "short",
                     year: "numeric",
@@ -125,14 +123,11 @@ export default function EditableAttendanceTable({ data }: { data: any[] }) {
                 <p>
                   Date:{" "}
                   <span className="text-muted-foreground">
-                    {new Date(selectedEntry.lastDate).toLocaleDateString(
-                      "en-IN",
-                      {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      }
-                    )}
+                    {new Date(selectedEntry.date).toLocaleDateString("en-IN", {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    })}
                   </span>
                 </p>
               </div>
