@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -18,25 +17,21 @@ interface Course {
 interface CourseFilterProps {
   courses: Course[];
   selectedCourse?: string;
+  onChange?: (courseId: string) => void;
 }
 
-export function CourseFilter({ courses, selectedCourse }: CourseFilterProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const handleCourseChange = (courseId: string) => {
-    const params = new URLSearchParams(searchParams);
-
-    params.set("course", courseId);
-
-    const queryString = params.toString();
-    const newUrl = queryString ? `?${queryString}` : "";
-
-    router.push(`${window.location.pathname}${newUrl}`);
-  };
-
+export function CourseFilter({
+  courses,
+  selectedCourse,
+  onChange,
+}: CourseFilterProps) {
   return (
-    <Select value={selectedCourse} onValueChange={handleCourseChange}>
+    <Select
+      value={selectedCourse || ""}
+      onValueChange={(value) => {
+        if (onChange) onChange(value);
+      }}
+    >
       <SelectTrigger className="w-full sm:w-[250px]">
         <SelectValue placeholder="Select a course" />
       </SelectTrigger>

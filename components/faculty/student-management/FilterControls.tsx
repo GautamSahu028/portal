@@ -1,48 +1,57 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { CourseFilter } from "@/components/faculty/student-management/CourseFilter";
 import { useState } from "react";
-import { DatePicker } from "./DatePicker";
 import { format } from "date-fns";
+import { DatePicker } from "./DatePicker";
+import { CourseFilter } from "./CourseFilter";
 
 export default function FilterControls({
-  selectedCourseId,
+  initialCourseId,
+  initialDate,
   allCourses,
-  selectedDate,
+  onApply,
 }: {
-  selectedCourseId: string;
-  allCourses: any[];
-  selectedDate?: string;
+  initialCourseId: string;
+  initialDate?: string;
+  allCourses: { id: string; code: string; name: string }[];
+  onApply: (courseId: string, date: string) => void;
 }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const [date, setDate] = useState<Date | undefined>(
-    selectedDate ? new Date(selectedDate) : undefined
+  const [selectedCourseId, setSelectedCourseId] = useState(initialCourseId);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    initialDate ? new Date(initialDate) : undefined
   );
 
-  const handleDateChange = (newDate: Date) => {
-    // 1️⃣ Update local state if needed:
-    setDate(newDate);
-
-    // 2️⃣ Copy over existing search params
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("course", selectedCourseId);
-
-    // 3️⃣ Format the newDate in local timezone as 'yyyy-MM-dd'
-    //    This will **not** shift backwards by UTC offset
-    const formatted = format(newDate, "yyyy-MM-dd");
-    params.set("date", formatted);
-
-    // 4️⃣ Push new URL
-    router.push(`?${params.toString()}`);
+  const handleApply = () => {
+    const dateToUse = selectedDate
+      ? format(selectedDate, "yyyy-MM-dd")
+      : format(new Date(), "yyyy-MM-dd");
+    onApply(selectedCourseId, dateToUse);
   };
 
   return (
-    <div className="flex flex-wrap gap-4 items-center px-6 py-4">
-      <CourseFilter courses={allCourses} selectedCourse={selectedCourseId} />
-      <DatePicker date={date} onChange={handleDateChange} />
+    <div className="flex gap-4 items-end flex-wrap px-6 py-4">
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium text-muted-foreground">
+          Course
+        </label>
+        <CourseFilter
+          courses={allCourses}
+          selectedCourse={selectedCourseId}
+          onChange={setSelectedCourseId}
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium text-muted-foreground">
+          Date
+        </label>
+        <DatePicker date={selectedDate} onChange={setSelectedDate} />
+      </div>
+      <button
+        onClick={handleApply}
+        className="h-10 px-4 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 transition"
+      >
+        Apply
+      </button>
     </div>
   );
 }

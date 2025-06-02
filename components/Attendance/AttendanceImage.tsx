@@ -158,8 +158,22 @@ const AttendanceImage: React.FC<AttendanceImageProps> = ({
       <div className="bg-muted rounded-2xl border border-border p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-6">
           <div className="bg-green-100 dark:bg-green-500/20 border border-green-300 dark:border-green-500/30 rounded-lg p-2 flex-shrink-0">
-            <svg className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 text-green-600 dark:text-green-400"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
+         10-4.48 10-10S17.52 2 12 2zm0 18
+         c-4.41 0-8-3.59-8-8s3.59-8 8-8
+         8 3.59 8 8-3.59 8-8 8zm-1-13
+         h2v6h-2zm0 8h2v2h-2z"
+                fill="currentColor"
+              />
+            </svg>
           </div>
+
           <h4 className="text-lg font-semibold text-foreground truncate">
             File Information
           </h4>

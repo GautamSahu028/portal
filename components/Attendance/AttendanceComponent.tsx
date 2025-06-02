@@ -197,7 +197,7 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
         status: record.status, // "PRESENT" or "ABSENT"
       }));
 
-      const response = await axios.post("/api/upsertAttendance", payload, {
+      const response = await axios.post("/api/insertAttendance", payload, {
         headers: {
           "Content-Type": "application/json",
         },

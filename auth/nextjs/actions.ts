@@ -74,8 +74,8 @@ export async function signUp(unsafeData: z.infer<typeof signUpSchema>) {
   } catch (error) {
     console.error("Error ---->  ", error);
   }
-  if (parsedRole == "FACULTY") redirect("/faculty/dashboard");
-  else redirect("/student/dashboard");
+  if (parsedRole == "FACULTY") redirect("/onboarding/faculty");
+  else redirect("/onboarding/student");
 }
 
 export async function logOut() {

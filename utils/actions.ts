@@ -4,21 +4,18 @@ import { AttendanceByDateItem, AttendanceOutput, FacultyCourse } from "./types";
 
 export async function getStudentsByFaculty() {
   try {
-    // Get the current logged-in user
     const currentUser = await getCurrentUser();
 
     if (!currentUser) {
       throw new Error("User not authenticated");
     }
 
-    // Check if the current user is a faculty member
     if (currentUser.role !== "FACULTY") {
       throw new Error(
         "Access denied. Only faculty members can view enrolled students."
       );
     }
 
-    // Get the faculty record for the current user
     const faculty = await db.faculty.findUnique({
       where: {
         userId: currentUser.id,
@@ -29,57 +26,90 @@ export async function getStudentsByFaculty() {
       throw new Error("Faculty record not found");
     }
 
-    // Get all students enrolled in courses taught by this faculty
-    const studentsInFacultyCourses = await db.student.findMany({
+    // Step 1: Get all subject IDs that have courses taught by this faculty
+    const taughtCourses = await db.course.findMany({
       where: {
-        enrollments: {
-          some: {
-            course: {
-              facultyId: faculty.id,
-            },
-          },
-        },
+        facultyId: faculty.id,
+      },
+      select: {
+        subjectId: true,
+      },
+    });
+
+    const taughtSubjectIds = Array.from(
+      new Set(taughtCourses.map((c) => c.subjectId))
+    );
+
+    // Step 2: Get all students enrolled in those subjects
+    const studentSubjects = await db.studentSubject.findMany({
+      where: {
+        subjectId: { in: taughtSubjectIds },
       },
       include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            createdAt: true,
-          },
-        },
-        enrollments: {
-          where: {
-            course: {
-              facultyId: faculty.id,
-            },
-          },
+        student: {
           include: {
-            course: {
+            user: {
               select: {
                 id: true,
-                code: true,
                 name: true,
-                description: true,
+                email: true,
+                createdAt: true,
+              },
+            },
+            subjectLinks: {
+              include: {
+                subject: {
+                  include: {
+                    courses: {
+                      where: {
+                        facultyId: faculty.id,
+                      },
+                      include: {
+                        subject: {
+                          select: {
+                            code: true,
+                            name: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
               },
             },
           },
         },
       },
-      orderBy: [{ rollNumber: "asc" }],
     });
 
-    // Transform the data for easier consumption
-    const formattedStudents = studentsInFacultyCourses.map((student) => ({
-      id: student.id,
-      rollNumber: student.rollNumber,
-      enrollmentNumber: student.enrollmentNumber,
-      department: student.department,
-      currentSemester: student.currentSemester,
-      user: student.user,
-      courses: student.enrollments.map((enrollment) => enrollment.course),
-    }));
+    // Step 3: Format into the expected response shape
+    const seen = new Set();
+    const formattedStudents = [];
+
+    for (const ss of studentSubjects) {
+      const student = ss.student;
+
+      if (seen.has(student.id)) continue;
+      seen.add(student.id);
+
+      const allCourses = student.subjectLinks.flatMap((link) =>
+        link.subject.courses.map((course) => ({
+          id: course.id,
+          subjectCode: course.subject.code,
+          subjectName: course.subject.name,
+        }))
+      );
+
+      formattedStudents.push({
+        id: student.id,
+        rollNumber: student.rollNumber,
+        enrollmentNumber: student.enrollmentNumber,
+        department: student.department,
+        currentSemester: student.currentSemester,
+        user: student.user,
+        courses: allCourses,
+      });
+    }
 
     return {
       success: true,
@@ -122,11 +152,14 @@ export async function getStudentsByCourse(courseId: string) {
       throw new Error("Faculty record not found");
     }
 
-    // Verify that the course belongs to this faculty
+    // Validate course belongs to this faculty and fetch its subject
     const course = await db.course.findFirst({
       where: {
         id: courseId,
         facultyId: faculty.id,
+      },
+      include: {
+        subject: true,
       },
     });
 
@@ -136,29 +169,28 @@ export async function getStudentsByCourse(courseId: string) {
       );
     }
 
-    // Get students enrolled in the specific course
-    const studentsInCourse = await db.student.findMany({
+    // Get students who are enrolled in the subject of this course
+    const studentSubjects = await db.studentSubject.findMany({
       where: {
-        enrollments: {
-          some: {
-            courseId: courseId,
-          },
-        },
+        subjectId: course.subjectId,
       },
       include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            createdAt: true,
+        student: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                createdAt: true,
+              },
+            },
           },
         },
       },
-      orderBy: [{ rollNumber: "asc" }],
     });
 
-    const formattedStudents = studentsInCourse.map((student) => ({
+    const formattedStudents = studentSubjects.map(({ student }) => ({
       id: student.id,
       rollNumber: student.rollNumber,
       enrollmentNumber: student.enrollmentNumber,
@@ -172,9 +204,8 @@ export async function getStudentsByCourse(courseId: string) {
       data: formattedStudents,
       course: {
         id: course.id,
-        code: course.code,
-        name: course.name,
-        description: course.description,
+        code: course.subject.code,
+        name: course.subject.name,
       },
       totalStudents: formattedStudents.length,
     };
@@ -201,6 +232,37 @@ export async function getFacultyCoursesByUserId(
         },
       },
       include: {
+        subject: {
+          include: {
+            enrollments: {
+              include: {
+                student: {
+                  include: {
+                    user: {
+                      select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                      },
+                    },
+                  },
+                },
+              },
+              orderBy: {
+                student: {
+                  user: {
+                    name: "asc",
+                  },
+                },
+              },
+            },
+            _count: {
+              select: {
+                enrollments: true,
+              },
+            },
+          },
+        },
         faculty: {
           include: {
             user: {
@@ -211,33 +273,6 @@ export async function getFacultyCoursesByUserId(
             },
           },
         },
-        enrollments: {
-          include: {
-            student: {
-              include: {
-                user: {
-                  select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                  },
-                },
-              },
-            },
-          },
-          orderBy: {
-            student: {
-              user: {
-                name: "asc",
-              },
-            },
-          },
-        },
-        _count: {
-          select: {
-            enrollments: true,
-          },
-        },
       },
       orderBy: {
         createdAt: "desc",
@@ -246,12 +281,12 @@ export async function getFacultyCoursesByUserId(
 
     return courses.map((course) => ({
       id: course.id,
-      code: course.code,
-      name: course.name,
-      description: course.description,
+      code: course.subject.code,
+      name: course.subject.name,
+      description: null, // no longer in schema
       createdAt: course.createdAt,
-      enrolledStudentsCount: course._count.enrollments,
-      enrolledStudents: course.enrollments.map((enrollment) => ({
+      enrolledStudentsCount: course.subject._count.enrollments,
+      enrolledStudents: course.subject.enrollments.map((enrollment) => ({
         id: enrollment.student.id,
         rollNumber: enrollment.student.rollNumber,
         enrollmentNumber: enrollment.student.enrollmentNumber,
@@ -265,7 +300,6 @@ export async function getFacultyCoursesByUserId(
       })),
       faculty: {
         id: course.faculty.id,
-        employeeId: course.faculty.employeeId,
         department: course.faculty.department,
         designation: course.faculty.designation,
         user: {
@@ -280,194 +314,6 @@ export async function getFacultyCoursesByUserId(
   }
 }
 
-export async function getCourse(courseId: string) {
-  try {
-    const course = await db.course.findUnique({
-      where: {
-        id: courseId,
-      },
-      include: {
-        faculty: {
-          include: {
-            user: {
-              select: {
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-        enrollments: {
-          include: {
-            student: {
-              include: {
-                user: {
-                  select: {
-                    name: true,
-                    email: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-        attendances: {
-          include: {
-            student: {
-              include: {
-                user: {
-                  select: {
-                    name: true,
-                  },
-                },
-              },
-            },
-          },
-          orderBy: {
-            date: "desc",
-          },
-        },
-        announcements: {
-          orderBy: {
-            postedAt: "desc",
-          },
-        },
-        semestersGrades: {
-          include: {
-            semester: {
-              include: {
-                student: {
-                  include: {
-                    user: {
-                      select: {
-                        name: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (!course) {
-      return {
-        success: false,
-        error: "Course not found",
-        data: null,
-      };
-    }
-
-    return {
-      success: true,
-      error: null,
-      data: course,
-    };
-  } catch (error) {
-    console.error("Error fetching course:", error);
-    return {
-      success: false,
-      error: "Failed to fetch course",
-      data: null,
-    };
-  }
-}
-
-export async function getCourseBasic(courseId: string) {
-  try {
-    const course = await db.course.findUnique({
-      where: {
-        id: courseId,
-      },
-      include: {
-        faculty: {
-          include: {
-            user: {
-              select: {
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (!course) {
-      return {
-        success: false,
-        error: "Course not found",
-        data: null,
-      };
-    }
-
-    return {
-      success: true,
-      error: null,
-      data: course,
-    };
-  } catch (error) {
-    console.error("Error fetching course:", error);
-    return {
-      success: false,
-      error: "Failed to fetch course",
-      data: null,
-    };
-  }
-}
-
-export async function getCourseWithStats(courseId: string) {
-  try {
-    const course = await db.course.findUnique({
-      where: {
-        id: courseId,
-      },
-      include: {
-        faculty: {
-          include: {
-            user: {
-              select: {
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-        _count: {
-          select: {
-            enrollments: true,
-            attendances: true,
-            announcements: true,
-          },
-        },
-      },
-    });
-
-    if (!course) {
-      return {
-        success: false,
-        error: "Course not found",
-        data: null,
-      };
-    }
-
-    return {
-      success: true,
-      error: null,
-      data: course,
-    };
-  } catch (error) {
-    console.error("Error fetching course:", error);
-    return {
-      success: false,
-      error: "Failed to fetch course",
-      data: null,
-    };
-  }
-}
-
 export const getAttendanceByCourseId = async (
   courseId: string
 ): Promise<
@@ -475,26 +321,32 @@ export const getAttendanceByCourseId = async (
   | { success: false; error: string }
 > => {
   try {
-    // 1) Fetch all attendance rows for this course, in ASCENDING date order:
     const attendanceRecords = await db.attendance.findMany({
       where: { courseId },
       include: {
         student: {
-          include: { user: true },
+          include: {
+            user: true,
+          },
         },
-        course: true,
+        course: {
+          include: {
+            subject: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
       orderBy: { date: "asc" },
     });
 
-    // 2) Prepare a Map to track, for each studentId, how many records we've seen so far
-    //    and how many of those were PRESENT.
     const perStudentTotals = new Map<
       string,
       { seen: number; present: number }
     >();
 
-    // 3) Build the AttendanceByDateItem[] in ascending‐date order, calculating "running %"
     const itemsAsc: AttendanceByDateItem[] = attendanceRecords.map((r) => {
       const sid = r.studentId;
       if (!perStudentTotals.has(sid)) {
@@ -507,7 +359,6 @@ export const getAttendanceByCourseId = async (
         totals.present += 1;
       }
 
-      // Compute running percentage up to _this_ row:
       const pctSoFar =
         totals.seen > 0
           ? ((totals.present / totals.seen) * 100).toFixed(2)
@@ -518,7 +369,7 @@ export const getAttendanceByCourseId = async (
         courseId: r.courseId,
         roll: r.student.rollNumber,
         name: r.student.user.name,
-        course: r.course.name,
+        course: r.course.subject.name, // updated here
         semester: r.student.currentSemester,
         percentage: pctSoFar,
         status: r.status as "PRESENT" | "ABSENT",
@@ -526,7 +377,6 @@ export const getAttendanceByCourseId = async (
       };
     });
 
-    // 4) Reverse so that the most recent date is first
     const finalData = itemsAsc.reverse();
 
     return { success: true, data: finalData };
@@ -546,7 +396,6 @@ export async function getAttendanceByDate(
   | { success: false; error: string }
 > {
   try {
-    // 1. Authentication & Role Check (optional: only FACULTY can view)
     const currentUser = await getCurrentUser();
     if (!currentUser) {
       throw new Error("User not authenticated");
@@ -557,19 +406,12 @@ export async function getAttendanceByDate(
       );
     }
 
-    // 2. Parse the incoming date
-    //    We treat dateString as "YYYY-MM-DD".
     const dayStart = new Date(dateString);
     dayStart.setUTCHours(0, 0, 0, 0);
-
-    //    dayEnd = the very start of the *next* UTC day:
     const dayEnd = new Date(dayStart);
     dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
     dayEnd.setUTCHours(0, 0, 0, 0);
 
-    // 3. Fetch every Attendance record whose `date` is >= dayStart AND < dayEnd
-    //    Include student → user (to get `name`) and the student’s `rollNumber` & `currentSemester`
-    //    Also include course → name.
     const todayRecords = await db.attendance.findMany({
       where: {
         date: {
@@ -589,66 +431,63 @@ export async function getAttendanceByDate(
           },
         },
         course: {
-          select: { id: true, name: true },
+          include: {
+            subject: {
+              select: { name: true },
+            },
+          },
         },
       },
       orderBy: {
-        // (optional) sort by course name, then student roll
-        course: { name: "asc" },
-        student: { rollNumber: "asc" },
+        course: {
+          subject: {
+            name: "asc",
+          },
+        },
+        student: {
+          rollNumber: "asc",
+        },
       },
     });
 
-    // 4. For each attendance record, compute the cumulative attendance percentage up to `dayEnd`:
-    //    - totalCount = # of attendance rows for that studentId & courseId where date <= dayEnd
-    //    - presentCount = same filter + status = PRESENT
-    //
-    //    We do a small loop and run two `count()` calls per record. If you have many records,
-    //    you could optimize by batching or grouping first, but this is O(N) where N = number of records today.
     const formatted: AttendanceByDateItem[] = [];
+
     for (const rec of todayRecords) {
       const sid = rec.studentId;
       const cid = rec.courseId;
-      const cutoff = dayEnd; // <= dayEnd (so includes all records on the given day)
 
-      // 4a. Count how many attendance rows exist *up to and including* the target date:
       const totalCount = await db.attendance.count({
         where: {
           studentId: sid,
           courseId: cid,
-          date: { lte: cutoff },
+          date: { lte: dayEnd },
         },
       });
 
-      // 4b. Count how many of those have status = PRESENT:
       const presentCount = await db.attendance.count({
         where: {
           studentId: sid,
           courseId: cid,
-          date: { lte: cutoff },
+          date: { lte: dayEnd },
           status: "PRESENT",
         },
       });
 
-      // 4c. Compute percentage string (two decimals):
-      //     If there is no historical attendance (shouldn’t happen if today’s record exists),
-      //     we guard against division-by-zero.
-      let percentStr = "0.00%";
-      if (totalCount > 0) {
-        const pct = (presentCount / totalCount) * 100;
-        percentStr = pct.toFixed(2) + "%";
-      }
+      const percentage =
+        totalCount > 0
+          ? ((presentCount / totalCount) * 100).toFixed(2) + "%"
+          : "0.00%";
 
       formatted.push({
         studentId: rec.studentId,
         courseId: rec.courseId,
         roll: rec.student.rollNumber,
         name: rec.student.user.name,
-        course: rec.course.name,
+        course: rec.course.subject.name, // updated to get name from subject
         semester: rec.student.currentSemester,
-        percentage: percentStr,
-        status: rec.status, // "PRESENT" or "ABSENT"
-        date: rec.date.toISOString(), // ISO string of the actual attendance timestamp
+        percentage,
+        status: rec.status,
+        date: rec.date.toISOString(),
       });
     }
 
@@ -672,10 +511,15 @@ export async function getFacultyProfile() {
     where: { userId: currentUser.id },
     include: {
       user: true,
-      courses: true,
-      announcements: {
-        orderBy: { postedAt: "desc" },
-        take: 5,
+      courses: {
+        include: {
+          subject: {
+            select: {
+              code: true,
+              name: true,
+            },
+          },
+        },
       },
     },
   });
@@ -683,12 +527,16 @@ export async function getFacultyProfile() {
   if (!faculty) throw new Error("Faculty not found");
 
   return {
+    id: faculty.id,
     name: faculty.user.name,
     email: faculty.user.email,
     department: faculty.department,
     designation: faculty.designation,
-    employeeId: faculty.employeeId,
-    courses: faculty.courses,
-    announcements: faculty.announcements,
+    courses: faculty.courses.map((course) => ({
+      id: course.id,
+      createdAt: course.createdAt,
+      subjectCode: course.subject.code,
+      subjectName: course.subject.name,
+    })),
   };
 }

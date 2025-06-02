@@ -62,3 +62,9 @@ export const sessionSchema = z.object({
     invalid_type_error: "User role must be either ADMIN or USER",
   }),
 });
+
+export const FacultyOnboardingSchema = z.object({
+  department: z.string().min(1, "Department is required"),
+  designation: z.string().min(1, "Designation is required"),
+  subjectId: z.string().min(1, "Subject is required"),
+});

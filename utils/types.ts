@@ -23,7 +23,6 @@ export interface FacultyCourse {
   enrolledStudents: EnrolledStudent[]; // Added this field
   faculty: {
     id: string;
-    employeeId: string;
     department: string;
     designation: string;
     user: {

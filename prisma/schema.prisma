@@ -9,14 +9,13 @@ datasource db {
 
 model User {
   id        String   @id @default(uuid())
-  name      String   
+  name      String
   email     String   @unique
   password  String
-  salt      String 
+  salt      String
   role      Role
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 
   student   Student?
   faculty   Faculty?
@@ -27,64 +26,65 @@ enum Role {
   STUDENT
 }
 
-model Student {
-  id               String          @id @default(uuid())
-  userId           String          @unique
-  rollNumber       String          @unique
-  enrollmentNumber String          @unique
-  department       String
-  currentSemester  Int             // current semester number
+model Subject {
+  id          String           @id @default(uuid())
+  code        String           @unique
+  name        String
 
-  user             User            @relation(fields: [userId], references: [id])
-  enrollments      StudentCourse[]
+  courses     Course[]         // Offerings by faculties
+  enrollments StudentSubject[] // Students registered to the subject
+}
+
+model Student {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  rollNumber       String   @unique
+  enrollmentNumber String   @unique
+  department       String
+  currentSemester  Int      // Flattened, no separate Semester model
+
+  user             User     @relation(fields: [userId], references: [id])
   attendances      Attendance[]
-  semesters        Semester[]      // relation to semesters with grades
+  subjectLinks     StudentSubject[]
 }
 
 model Faculty {
   id            String   @id @default(uuid())
   userId        String   @unique
-  employeeId    String   @unique
   department    String
   designation   String
 
   user          User     @relation(fields: [userId], references: [id])
   courses       Course[]
-  announcements Announcement[]
 }
 
 model Course {
-  id           String          @id @default(uuid())
-  code         String          @unique
-  name         String
-  description  String?
+  id           String   @id @default(uuid())
+  subjectId    String
   facultyId    String
+  createdAt    DateTime @default(now())
 
-  faculty      Faculty         @relation(fields: [facultyId], references: [id])
-  enrollments  StudentCourse[]
+  subject      Subject  @relation(fields: [subjectId], references: [id])
+  faculty      Faculty  @relation(fields: [facultyId], references: [id])
   attendances  Attendance[]
-  semestersGrades SemesterGrade[]  // link to SemesterGrade to track grades per semester
-  announcements Announcement[]
-  createdAt    DateTime        @default(now())
 }
 
+model StudentSubject {
+  id         String   @id @default(uuid())
+  studentId  String
+  subjectId  String
 
-model StudentCourse {
-  id        String   @id @default(uuid())
-  studentId String
-  courseId  String
+  student    Student  @relation(fields: [studentId], references: [id])
+  subject    Subject  @relation(fields: [subjectId], references: [id])
 
-  student   Student  @relation(fields: [studentId], references: [id])
-  course    Course   @relation(fields: [courseId], references: [id])
-
-  @@unique([studentId, courseId])
+  @@unique([studentId, subjectId])
 }
 
 model Attendance {
   id        String   @id @default(uuid())
   studentId String
   courseId  String
-  date      DateTime @db.Date  // Store only date part (YYYY-MM-DD)
+  date      DateTime @db.Date
   status    AttendanceStatus
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -92,56 +92,10 @@ model Attendance {
   student   Student  @relation(fields: [studentId], references: [id])
   course    Course   @relation(fields: [courseId], references: [id])
 
-  // One attendance record per student per course per day
   @@unique([studentId, courseId, date])
 }
 
 enum AttendanceStatus {
   PRESENT
   ABSENT
-}
-
-model Semester {
-  id          String           @id @default(uuid())
-  studentId   String
-  number      Int              // e.g., 5 for 5th semester
-  spi         Float            // Semester Performance Index
-  cpi         Float            // Cumulative Performance Index
-  createdAt   DateTime         @default(now())
-
-  student     Student          @relation(fields: [studentId], references: [id])
-  grades      SemesterGrade[]
-}
-
-model SemesterGrade {
-  id          String   @id @default(uuid())
-  semesterId  String
-  courseId    String
-  grade       Grade   // e.g., A, B, O
-  gradePoint  Int      // e.g., 10, 9, 8
-
-  semester    Semester @relation(fields: [semesterId], references: [id])
-  course      Course   @relation(fields: [courseId], references: [id])
-}
-
-enum Grade {
-  A
-  B
-  C
-  D
-  E
-  F
-  O
-}
-
-model Announcement {
-  id         String   @id @default(uuid())
-  title      String
-  content    String
-  courseId   String?
-  facultyId  String
-  postedAt   DateTime @default(now())
-
-  faculty    Faculty  @relation(fields: [facultyId], references: [id])
-  course     Course?  @relation(fields: [courseId], references: [id])
 }
