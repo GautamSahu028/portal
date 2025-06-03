@@ -23,8 +23,10 @@ export async function middleware(request: NextRequest) {
 async function middlewareAuth(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  const isFacultyRoute = path.startsWith("/faculty");
-  const isStudentRoute = path.startsWith("/student");
+  const isFacultyRoute =
+    path.startsWith("/faculty") || path.startsWith("/onboarding/faculty");
+  const isStudentRoute =
+    path.startsWith("/student") || path.startsWith("/onboarding/faculty");
   const isPrivateRoute = isFacultyRoute || isStudentRoute;
 
   if (isPrivateRoute) {

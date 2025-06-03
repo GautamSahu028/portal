@@ -168,37 +168,39 @@ const AttendanceResultComponent: React.FC<AttendanceResultComponentProps> = ({
                     colSpan={7}
                   />
                 ) : (
-                  filteredAttendanceData.map((item) => (
-                    <TableRow
-                      key={`${item.studentId}-${item.courseId}-${item.date}`}
-                    >
-                      <TableCell>{item.roll}</TableCell>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.course}</TableCell>
-                      <TableCell>{item.semester}</TableCell>
-                      <TableCell
-                        className={`text-center font-semibold ${
-                          parseFloat(item.percentage) >= 80
-                            ? "text-green-500"
-                            : parseFloat(item.percentage) >= 70
-                            ? "text-yellow-500"
-                            : "text-red-500"
-                        }`}
+                  [...filteredAttendanceData]
+                    .sort((a, b) => a.roll.localeCompare(b.roll))
+                    .map((item) => (
+                      <TableRow
+                        key={`${item.studentId}-${item.courseId}-${item.date}`}
                       >
-                        {item.percentage}
-                      </TableCell>
-                      <TableCell
-                        className={`text-center font-semibold ${
-                          item.status === "PRESENT"
-                            ? "text-green-500"
-                            : "text-red-500"
-                        }`}
-                      >
-                        {item.status}
-                      </TableCell>
-                      <TableCell>{item.date}</TableCell>
-                    </TableRow>
-                  ))
+                        <TableCell>{item.roll}</TableCell>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>{item.course}</TableCell>
+                        <TableCell>{item.semester}</TableCell>
+                        <TableCell
+                          className={`text-center font-semibold ${
+                            parseFloat(item.percentage) >= 80
+                              ? "text-green-500"
+                              : parseFloat(item.percentage) >= 70
+                              ? "text-yellow-500"
+                              : "text-red-500"
+                          }`}
+                        >
+                          {item.percentage}
+                        </TableCell>
+                        <TableCell
+                          className={`text-center font-semibold ${
+                            item.status === "PRESENT"
+                              ? "text-green-500"
+                              : "text-red-500"
+                          }`}
+                        >
+                          {item.status}
+                        </TableCell>
+                        <TableCell>{item.date}</TableCell>
+                      </TableRow>
+                    ))
                 )}
               </TableBody>
             </Table>
