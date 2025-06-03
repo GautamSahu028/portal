@@ -140,6 +140,13 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
       return;
     }
 
+    const selectedCourse = courses.find((c) => c.id === selectedCourseId);
+
+    if (selectedCourse && selectedCourse.enrolledStudentsCount === 0) {
+      setCourseSelectionError("No registered student");
+      return;
+    }
+
     if (uploadedImage) {
       try {
         setIsProcessing(true);
@@ -234,6 +241,10 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
           isFinalAttendance={isFinalAttendance}
           upsertAttendance={upsertFinalAttendance}
           finalAttendance={finalAttendance}
+          setUploadedImage={setUploadedImage}
+          setAttendanceStatus={setAttendanceStatus}
+          setFullAttendanceRecords={setFullAttendanceRecords}
+          setFinalAttendance={setFinalAttendance}
         />
 
         {/* Course Selection Card */}

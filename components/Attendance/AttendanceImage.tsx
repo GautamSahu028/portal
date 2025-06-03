@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 
@@ -137,46 +139,39 @@ const AttendanceImage: React.FC<AttendanceImageProps> = ({
 
   return (
     <div className="space-y-6 min-w-0">
-      <div className="bg-muted rounded-2xl border border-border p-6 shadow-md overflow-hidden">
-        <div className="relative group w-full">
-          <div className="w-full overflow-hidden rounded-xl">
-            <Image
-              src={imagePreview}
-              alt="Attendance"
-              width={800}
-              height={600}
-              className="w-full h-auto max-h-96 object-contain rounded-xl shadow-sm border border-border transition-transform group-hover:scale-[1.02]"
-            />
-          </div>
-
-          <div className="absolute top-4 right-4 bg-popover text-foreground px-3 py-1 rounded-md border border-border shadow-sm">
-            <span className="text-xs font-medium">
-              {uploadedImage.type.split("/")[1]?.toUpperCase()}
-            </span>
-          </div>
+      {/* Preview Image with Remove Button */}
+      <div className="bg-muted rounded-2xl border border-border p-6 shadow-md overflow-hidden relative group">
+        {/* Image */}
+        <div className="w-full overflow-hidden rounded-xl">
+          <Image
+            src={imagePreview}
+            alt="Attendance"
+            width={800}
+            height={600}
+            unoptimized
+            className="w-full h-auto max-h-96 object-contain rounded-xl shadow-sm border border-border transition-transform group-hover:scale-[1.02]"
+          />
         </div>
       </div>
 
-      {/* Image Details */}
+      {/* Image Details Section */}
       <div className="bg-muted rounded-2xl border border-border p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-6">
           <div className="bg-green-100 dark:bg-green-500/20 border border-green-300 dark:border-green-500/30 rounded-lg p-2 flex-shrink-0">
             <svg
-              xmlns="http://www.w3.org/2000/svg"
               className="w-5 h-5 text-green-600 dark:text-green-400"
               viewBox="0 0 24 24"
             >
               <path
                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
-         10-4.48 10-10S17.52 2 12 2zm0 18
-         c-4.41 0-8-3.59-8-8s3.59-8 8-8
-         8 3.59 8 8-3.59 8-8 8zm-1-13
-         h2v6h-2zm0 8h2v2h-2z"
+                  10-4.48 10-10S17.52 2 12 2zm0 18
+                  c-4.41 0-8-3.59-8-8s3.59-8 8-8
+                  8 3.59 8 8-3.59 8-8 8zm-1-13
+                  h2v6h-2zm0 8h2v2h-2z"
                 fill="currentColor"
               />
             </svg>
           </div>
-
           <h4 className="text-lg font-semibold text-foreground truncate">
             File Information
           </h4>

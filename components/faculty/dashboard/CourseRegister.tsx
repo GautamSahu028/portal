@@ -49,7 +49,7 @@ export default function CourseRegister({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="px-4 py-2 rounded-lg bg-primary/20 text-foreground hover:bg-primary/10 hover:cursor-pointer font-medium transition"
+        className="px-4 py-2 rounded-lg bg-green-500/20 text-green-700 dark:text-green-400 hover:bg-green-500/30 hover:cursor-pointer font-medium transition"
       >
         + Register Course
       </button>

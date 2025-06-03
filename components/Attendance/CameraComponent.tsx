@@ -19,95 +19,150 @@ function CameraComponent({ onCapture, onClose }: CameraComponentProps) {
   useEffect(() => {
     isMountedRef.current = true;
 
-    const initTimer = setTimeout(() => {
-      if (isMountedRef.current) {
-        initializeCamera();
-      }
-    }, 100);
-
-    // ✅ Snapshot the current ref value here
     const videoElement = videoRef.current;
+
+    const initializeCamera = async () => {
+      try {
+        setError(null);
+
+        setCameraStream((prevStream) => {
+          if (prevStream) {
+            prevStream.getTracks().forEach((track) => track.stop());
+          }
+          return null;
+        });
+
+        if (videoElement) {
+          videoElement.srcObject = null;
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: "user",
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+        });
+
+        if (!isMountedRef.current) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+
+        setCameraStream(stream);
+
+        if (videoElement) {
+          videoElement.srcObject = stream;
+
+          videoElement.onloadedmetadata = () => {
+            if (!isMountedRef.current || !videoElement) return;
+
+            const playPromise = videoElement.play();
+            if (playPromise !== undefined) {
+              playPromise
+                .then(() => {
+                  if (isMountedRef.current) {
+                    setIsReady(true);
+                  }
+                })
+                .catch((err) => {
+                  if (isMountedRef.current) {
+                    console.error("Error playing video:", err);
+                    setError(`Failed to play video: ${err.message}`);
+                  }
+                });
+            }
+          };
+        }
+      } catch (err) {
+        if (isMountedRef.current) {
+          console.error("Camera access error:", err);
+          setError(`Camera access failed: ${(err as Error).message}`);
+        }
+      }
+    };
+
+    const initTimer = setTimeout(() => {
+      initializeCamera();
+    }, 100);
 
     return () => {
       isMountedRef.current = false;
       clearTimeout(initTimer);
-
       if (cameraStream) {
         cameraStream.getTracks().forEach((track) => track.stop());
       }
-
-      // ✅ Use the snapshot instead of videoRef.current
       if (videoElement) {
         videoElement.srcObject = null;
       }
     };
-  }, [cameraStream, initializeCamera]);
+  }, []); // ✅ No dependencies
 
-  async function initializeCamera() {
-    try {
-      setError(null);
+  // async function initializeCamera() {
+  //   try {
+  //     setError(null);
 
-      // Clean up any existing stream first
-      if (cameraStream) {
-        cameraStream.getTracks().forEach((track) => track.stop());
-      }
+  //     // Clean up any existing stream first
+  //     if (cameraStream) {
+  //       cameraStream.getTracks().forEach((track) => track.stop());
+  //     }
 
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
-      }
+  //     if (videoRef.current) {
+  //       videoRef.current.srcObject = null;
+  //     }
 
-      // Request camera access
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "user",
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-      });
+  //     // Request camera access
+  //     const stream = await navigator.mediaDevices.getUserMedia({
+  //       video: {
+  //         facingMode: "user",
+  //         width: { ideal: 1280 },
+  //         height: { ideal: 720 },
+  //       },
+  //     });
 
-      // Check if component is still mounted
-      if (!isMountedRef.current) {
-        // Clean up if component unmounted during async operation
-        stream.getTracks().forEach((track) => track.stop());
-        return;
-      }
+  //     // Check if component is still mounted
+  //     if (!isMountedRef.current) {
+  //       // Clean up if component unmounted during async operation
+  //       stream.getTracks().forEach((track) => track.stop());
+  //       return;
+  //     }
 
-      setCameraStream(stream);
+  //     setCameraStream(stream);
 
-      // Set the stream to the video element
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+  //     // Set the stream to the video element
+  //     if (videoRef.current) {
+  //       videoRef.current.srcObject = stream;
 
-        // Set up event listeners before calling play()
-        videoRef.current.onloadedmetadata = () => {
-          if (!isMountedRef.current || !videoRef.current) return;
+  //       // Set up event listeners before calling play()
+  //       videoRef.current.onloadedmetadata = () => {
+  //         if (!isMountedRef.current || !videoRef.current) return;
 
-          // Try playing the video after metadata is loaded
-          const playPromise = videoRef.current.play();
+  //         // Try playing the video after metadata is loaded
+  //         const playPromise = videoRef.current.play();
 
-          if (playPromise !== undefined) {
-            playPromise
-              .then(() => {
-                if (isMountedRef.current) {
-                  setIsReady(true);
-                }
-              })
-              .catch((err) => {
-                if (isMountedRef.current) {
-                  console.error("Error playing video:", err);
-                  setError(`Failed to play video: ${err.message}`);
-                }
-              });
-          }
-        };
-      }
-    } catch (err) {
-      if (isMountedRef.current) {
-        console.error("Camera access error:", err);
-        setError(`Camera access failed: ${(err as Error).message}`);
-      }
-    }
-  }
+  //         if (playPromise !== undefined) {
+  //           playPromise
+  //             .then(() => {
+  //               if (isMountedRef.current) {
+  //                 setIsReady(true);
+  //               }
+  //             })
+  //             .catch((err) => {
+  //               if (isMountedRef.current) {
+  //                 console.error("Error playing video:", err);
+  //                 setError(`Failed to play video: ${err.message}`);
+  //               }
+  //             });
+  //         }
+  //       };
+  //     }
+  //   } catch (err) {
+  //     if (isMountedRef.current) {
+  //       console.error("Camera access error:", err);
+  //       setError(`Camera access failed: ${(err as Error).message}`);
+  //     }
+  //   }
+  // }
 
   function handleCapture() {
     try {
@@ -124,25 +179,20 @@ function CameraComponent({ onCapture, onClose }: CameraComponentProps) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
 
-      // Set canvas dimensions to match video
       canvas.width = video.videoWidth || 640;
       canvas.height = video.videoHeight || 480;
 
-      // Draw the current video frame to the canvas
       const context = canvas.getContext("2d");
       if (!context) {
         setError("Could not get canvas context");
         return;
       }
 
-      // Clear the canvas and draw video frame
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      // Get image as data URL
       const imageDataUrl = canvas.toDataURL("image/jpeg", 0.9);
 
-      // Convert to blob and create File
       canvas.toBlob(
         (blob) => {
           if (!blob) {
@@ -150,14 +200,24 @@ function CameraComponent({ onCapture, onClose }: CameraComponentProps) {
             return;
           }
 
-          // Create a File object from the blob
           const capturedFile = new File([blob], "captured-image.jpg", {
             type: "image/jpeg",
             lastModified: Date.now(),
           });
 
-          // Send captured image back to parent component
+          // ✅ STOP the camera stream
+          if (cameraStream) {
+            cameraStream.getTracks().forEach((track) => track.stop());
+          }
+
+          // ✅ Clear video stream
+          if (videoRef.current) {
+            videoRef.current.srcObject = null;
+          }
+
+          // ✅ Notify parent and close camera UI
           onCapture(capturedFile, imageDataUrl);
+          onClose(); // 👈 This ensures UI closes
         },
         "image/jpeg",
         0.9
@@ -190,9 +250,9 @@ function CameraComponent({ onCapture, onClose }: CameraComponentProps) {
           <button
             onClick={handleCapture}
             disabled={!isReady}
-            className={`px-4 py-2 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 ${
+            className={`hover:cursor-pointer px-4 py-2 rounded-lg text-sm font-medium bg-primary/10 focus:outline-none focus:ring-2 ${
               isReady
-                ? "bg-primary text-white hover:bg-primary/90 focus:ring-primary"
+                ? "bg-primary text-white hover:bg-primary/30 focus:ring-primary"
                 : "bg-muted text-muted-foreground cursor-not-allowed"
             }`}
           >

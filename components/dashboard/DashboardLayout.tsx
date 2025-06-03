@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import axios from "axios";
-import { GraduationCap, Settings, LogOut, Menu, X, Search } from "lucide-react";
+import { GraduationCap, LogOut, Menu, X, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -227,16 +227,6 @@ function UserMenu({
             </p>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link href={`/${user.role}/profile`} className="flex w-full">
-            Profile
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onLogout}>
           <LogOut className="mr-2 h-4 w-4" />

@@ -101,18 +101,18 @@ const AttendanceResultComponent: React.FC<AttendanceResultComponentProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-10">
-      <Card className="bg-slate-800 border-slate-700 mb-6">
+    <div className="min-h-screen bg-background text-foreground p-6 sm:p-10">
+      <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg text-white">
-            <CalendarDays className="w-5 h-5 text-green-400" />
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <CalendarDays className="w-5 h-5 text-green-500 dark:text-green-400" />
             Attendance Records for {selectedDate}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-between sm:flex-row gap-4 sm:items-center mb-6 w-full">
+          <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6 w-full">
             {/* Subject Dropdown + Get Attendance Button */}
-            <div className="flex gap-2 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <Select
                 value={selectedSubjectId}
                 onValueChange={setSelectedSubjectId}
@@ -129,28 +129,25 @@ const AttendanceResultComponent: React.FC<AttendanceResultComponentProps> = ({
                 </SelectContent>
               </Select>
               <Button
-                className="hover:cursor-pointer"
                 variant="outline"
                 onClick={handleLogSubject}
-                disabled={!selectedSubjectId} // ✅ disable if no subject selected
+                disabled={!selectedSubjectId}
               >
                 Get Attendance
               </Button>
             </div>
 
             {/* Date Picker */}
-            <div className="flex gap-2 w-full sm:w-auto">
-              <input
-                type="date"
-                className="bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white w-full sm:w-auto"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-              />
-            </div>
+            <input
+              type="date"
+              className="bg-background border border-border rounded-md px-3 py-2 text-foreground w-full sm:w-auto"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+            />
           </div>
 
           {/* Attendance Table */}
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-xl border border-border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -182,10 +179,10 @@ const AttendanceResultComponent: React.FC<AttendanceResultComponentProps> = ({
                       <TableCell
                         className={`text-center font-semibold ${
                           parseFloat(item.percentage) >= 80
-                            ? "text-green-400"
+                            ? "text-green-500"
                             : parseFloat(item.percentage) >= 70
-                            ? "text-yellow-400"
-                            : "text-red-400"
+                            ? "text-yellow-500"
+                            : "text-red-500"
                         }`}
                       >
                         {item.percentage}
@@ -193,8 +190,8 @@ const AttendanceResultComponent: React.FC<AttendanceResultComponentProps> = ({
                       <TableCell
                         className={`text-center font-semibold ${
                           item.status === "PRESENT"
-                            ? "text-green-400"
-                            : "text-red-400"
+                            ? "text-green-500"
+                            : "text-red-500"
                         }`}
                       >
                         {item.status}
