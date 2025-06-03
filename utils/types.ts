@@ -73,3 +73,17 @@ export interface AttendanceByDateItem {
   status: string; // "PRESENT" or "ABSENT"
   date: string; // ISO string for the attendance date
 }
+
+export interface FacultyProfile {
+  id: string;
+  name: string;
+  email: string;
+  department: string;
+  designation: string;
+  courses: {
+    id: string;
+    createdAt: Date;
+    subjectCode: string;
+    subjectName: string;
+  }[];
+}

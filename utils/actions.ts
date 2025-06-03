@@ -1,6 +1,11 @@
 import db from "@/utils/db";
 import { getCurrentUser } from "@/auth/nextjs/currentUser";
-import { AttendanceByDateItem, AttendanceOutput, FacultyCourse } from "./types";
+import {
+  AttendanceByDateItem,
+  AttendanceOutput,
+  FacultyCourse,
+  FacultyProfile,
+} from "./types";
 
 export async function getStudentsByFaculty() {
   try {
@@ -339,7 +344,11 @@ export const getAttendanceByCourseId = async (
           },
         },
       },
-      orderBy: { date: "asc" },
+      orderBy: {
+        student: {
+          rollNumber: "asc",
+        },
+      },
     });
 
     const perStudentTotals = new Map<
@@ -369,7 +378,7 @@ export const getAttendanceByCourseId = async (
         courseId: r.courseId,
         roll: r.student.rollNumber,
         name: r.student.user.name,
-        course: r.course.subject.name, // updated here
+        course: r.course.subject.name,
         semester: r.student.currentSemester,
         percentage: pctSoFar,
         status: r.status as "PRESENT" | "ABSENT",
@@ -377,9 +386,7 @@ export const getAttendanceByCourseId = async (
       };
     });
 
-    const finalData = itemsAsc.reverse();
-
-    return { success: true, data: finalData };
+    return { success: true, data: itemsAsc };
   } catch (error) {
     return {
       success: false,
@@ -501,42 +508,53 @@ export async function getAttendanceByDate(
   }
 }
 
-export async function getFacultyProfile() {
-  const currentUser = await getCurrentUser();
-  if (!currentUser || currentUser.role !== "FACULTY") {
-    throw new Error("Unauthorized or invalid role");
-  }
+export async function getFacultyProfile(): Promise<
+  { success: true; data: FacultyProfile } | { success: false; error: string }
+> {
+  try {
+    const currentUser = await getCurrentUser();
+    if (!currentUser || currentUser.role !== "FACULTY") {
+      throw new Error("Unauthorized or invalid role");
+    }
 
-  const faculty = await db.faculty.findUnique({
-    where: { userId: currentUser.id },
-    include: {
-      user: true,
-      courses: {
-        include: {
-          subject: {
-            select: {
-              code: true,
-              name: true,
+    const faculty = await db.faculty.findUnique({
+      where: { userId: currentUser.id },
+      include: {
+        user: true,
+        courses: {
+          include: {
+            subject: {
+              select: {
+                code: true,
+                name: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  if (!faculty) throw new Error("Faculty not found");
+    if (!faculty) throw new Error("Faculty not found");
 
-  return {
-    id: faculty.id,
-    name: faculty.user.name,
-    email: faculty.user.email,
-    department: faculty.department,
-    designation: faculty.designation,
-    courses: faculty.courses.map((course) => ({
-      id: course.id,
-      createdAt: course.createdAt,
-      subjectCode: course.subject.code,
-      subjectName: course.subject.name,
-    })),
-  };
+    const profile: FacultyProfile = {
+      id: faculty.id,
+      name: faculty.user.name,
+      email: faculty.user.email,
+      department: faculty.department,
+      designation: faculty.designation,
+      courses: faculty.courses.map((course) => ({
+        id: course.id,
+        createdAt: course.createdAt,
+        subjectCode: course.subject.code,
+        subjectName: course.subject.name,
+      })),
+    };
+
+    return { success: true, data: profile };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unexpected error",
+    };
+  }
 }

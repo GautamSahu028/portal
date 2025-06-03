@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, Calendar, GraduationCap, Clock, Users } from "lucide-react";
+import { BarChart, Calendar, GraduationCap, Users } from "lucide-react";
 import { User } from "@prisma/client";
 import RecentAnnouncements from "@/components/dashboard/recent-announcements";
 import StatCard from "@/components/dashboard/stat-card";

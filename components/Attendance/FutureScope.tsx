@@ -185,7 +185,7 @@ const FutureScope = () => {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 In the next update, teachers will simply click{" "}
                 <span className="text-primary font-medium">
-                  "Generate Report"
+                  &quot;Generate Report&quot;
                 </span>{" "}
                 and the system will automatically capture classroom images via
                 installed IP cameras. The images will be instantly processed

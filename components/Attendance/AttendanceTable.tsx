@@ -1,11 +1,7 @@
 import React from "react";
 import { AttendanceRecord } from "@/utils/types";
 
-interface AttendanceTableProps {
-  results: AttendanceRecord[];
-}
-
-function AttendanceTable({ results }: { results: any[] }) {
+function AttendanceTable({ results }: { results: AttendanceRecord[] }) {
   if (results.length === 0) {
     return (
       <div className="bg-muted border border-border rounded-lg p-8 text-center text-muted-foreground">

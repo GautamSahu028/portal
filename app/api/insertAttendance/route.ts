@@ -17,12 +17,17 @@ export async function POST(req: Request) {
         (record) =>
           record.studentId && record.courseId && record.date && record.status
       )
-      .map((record) => ({
-        studentId: record.studentId,
-        courseId: record.courseId,
-        date: new Date(record.date),
-        status: record.status,
-      }));
+      .map((record) => {
+        const date = new Date(record.date);
+        date.setUTCHours(0, 0, 0, 0); // 🌐 normalize to UTC midnight
+
+        return {
+          studentId: record.studentId,
+          courseId: record.courseId,
+          date,
+          status: record.status,
+        };
+      });
 
     if (validData.length === 0) {
       return NextResponse.json(

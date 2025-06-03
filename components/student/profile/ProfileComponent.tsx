@@ -208,24 +208,6 @@ export default function ProfileComponent({
     }
   };
 
-  interface AttendanceData {
-    month: string;
-    percentage: number;
-  }
-
-  interface GradeHistory {
-    subject: string;
-    grade: string;
-    credits: number;
-    semester: string;
-  }
-
-  interface Activity {
-    type: string;
-    message: string;
-    time: string;
-  }
-
   interface StudentProfile {
     rollNo: string;
     name: string;
@@ -264,8 +246,6 @@ export default function ProfileComponent({
     avatar: string;
     type: "faculty";
   }
-
-  type Profile = StudentProfile | FacultyProfile;
 
   const getAttendanceColor = (percentage: number): string => {
     if (percentage >= 90) return "text-green-400";

@@ -1,12 +1,32 @@
-// components/ui/EmptyTable.tsx
+"use client";
 
-import { CalendarX2 } from "lucide-react";
+import { Ban, Loader2 } from "lucide-react";
 
-export default function EmptyTable({ message }: { message: string }) {
-  return (
-    <div className="text-center text-slate-400 py-12 flex flex-col items-center justify-center">
-      <CalendarX2 className="h-12 w-12 mb-3 text-slate-600" />
-      <p className="text-sm">{message}</p>
-    </div>
-  );
+interface EmptyTableProps {
+  message?: string;
+  colSpan?: number;
+  loading?: boolean;
 }
+
+const EmptyTable: React.FC<EmptyTableProps> = ({
+  message = "No attendance data to show.",
+  colSpan = 7,
+  loading = false,
+}) => {
+  return (
+    <tr>
+      <td colSpan={colSpan}>
+        <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+          {loading ? (
+            <Loader2 className="w-6 h-6 animate-spin text-slate-500 mb-2" />
+          ) : (
+            <Ban className="w-8 h-8 mb-2 text-slate-500" />
+          )}
+          {!loading && <p className="text-sm">{message}</p>}
+        </div>
+      </td>
+    </tr>
+  );
+};
+
+export default EmptyTable;

@@ -17,35 +17,31 @@ function CameraComponent({ onCapture, onClose }: CameraComponentProps) {
 
   // Initialize camera on component mount
   useEffect(() => {
-    // Set mounted flag
     isMountedRef.current = true;
 
-    // Start camera with a small delay to ensure DOM is ready
     const initTimer = setTimeout(() => {
       if (isMountedRef.current) {
         initializeCamera();
       }
     }, 100);
 
-    // Clean up function
-    return () => {
-      // Set mounted flag to false
-      isMountedRef.current = false;
+    // ✅ Snapshot the current ref value here
+    const videoElement = videoRef.current;
 
-      // Clear initialization timer
+    return () => {
+      isMountedRef.current = false;
       clearTimeout(initTimer);
 
-      // Stop camera stream
       if (cameraStream) {
         cameraStream.getTracks().forEach((track) => track.stop());
       }
 
-      // Clear video source
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
+      // ✅ Use the snapshot instead of videoRef.current
+      if (videoElement) {
+        videoElement.srcObject = null;
       }
     };
-  }, []); // Empty dependency array - only run on mount/unmount
+  }, [cameraStream, initializeCamera]);
 
   async function initializeCamera() {
     try {

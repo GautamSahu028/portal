@@ -5,7 +5,7 @@ export async function GET(
   req: Request,
   { params }: { params: { courseId: string } }
 ) {
-  const courseId = params.courseId;
+  const courseId = (await params).courseId;
 
   const data = await db.attendance.findMany({
     where: { courseId },

@@ -16,7 +16,7 @@ export const parseAttendanceData = (
     minute: "2-digit",
   });
 
-  results.forEach((result, index) => {
+  results.forEach((result) => {
     // Skip empty strings
     if (!result.trim()) return;
 

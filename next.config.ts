@@ -16,6 +16,16 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
+  // next.config.js
+  images: {
+    dangerouslyAllowSVG: true,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

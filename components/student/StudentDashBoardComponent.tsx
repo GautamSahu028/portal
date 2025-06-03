@@ -69,7 +69,7 @@ export function StudentDashboardComponent({
             <div className="grid gap-4 md:grid-cols-2">
               <Card className="col-span-1">
                 <CardHeader>
-                  <CardTitle>Today's Schedule</CardTitle>
+                  <CardTitle>Today&rsquo;s Schedule</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <StudentSchedule daily />

@@ -6,19 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import axios from "axios";
-import {
-  GraduationCap,
-  Users,
-  Calendar,
-  BookOpen,
-  Bell,
-  MessageSquare,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-  Search,
-} from "lucide-react";
+import { GraduationCap, Settings, LogOut, Menu, X, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,

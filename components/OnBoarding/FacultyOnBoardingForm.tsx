@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { FacultyOnboardingSchema } from "@/auth/nextjs/schemas";
 import { useRouter } from "next/navigation";
 import { Subject } from "@prisma/client";

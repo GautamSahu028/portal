@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 interface AttendanceImageProps {
   imagePreview: string;
@@ -139,9 +140,11 @@ const AttendanceImage: React.FC<AttendanceImageProps> = ({
       <div className="bg-muted rounded-2xl border border-border p-6 shadow-md overflow-hidden">
         <div className="relative group w-full">
           <div className="w-full overflow-hidden rounded-xl">
-            <img
+            <Image
               src={imagePreview}
               alt="Attendance"
+              width={800}
+              height={600}
               className="w-full h-auto max-h-96 object-contain rounded-xl shadow-sm border border-border transition-transform group-hover:scale-[1.02]"
             />
           </div>
