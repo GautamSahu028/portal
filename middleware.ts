@@ -26,7 +26,7 @@ async function middlewareAuth(request: NextRequest) {
   const isFacultyRoute =
     path.startsWith("/faculty") || path.startsWith("/onboarding/faculty");
   const isStudentRoute =
-    path.startsWith("/student") || path.startsWith("/onboarding/faculty");
+    path.startsWith("/student") || path.startsWith("/onboarding/student");
   const isPrivateRoute = isFacultyRoute || isStudentRoute;
 
   if (isPrivateRoute) {
