@@ -112,14 +112,7 @@ export function SignInForm() {
             {isLoading ? "Signing In..." : "Sign In"}
           </Button>
 
-          <div className="text-center">
-            <Link
-              href="/sign-up"
-              className="text-white/80 hover:text-white text-sm font-medium transition-colors"
-            >
-              Don't have an account? Sign up
-            </Link>
-          </div>
+          <div className="text-center"></div>
         </div>
       </form>
     </Form>

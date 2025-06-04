@@ -287,65 +287,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      {/* <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h3 className="text-4xl font-bold text-white mb-4">
-              Trusted Worldwide
-            </h3>
-            <p className="text-slate-300 text-lg">
-              Join thousands of institutions already using EduManage
-            </p>
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 text-center">
-            <StatCard
-              number="99.9%"
-              label="Accuracy Rate"
-              icon={<CheckCircle />}
-            />
-            <StatCard number="&lt;1s" label="Response Time" icon={<Zap />} />
-            <StatCard number="24/7" label="Uptime SLA" icon={<Shield />} />
-            <StatCard number="500+" label="Institutions" icon={<Globe />} />
-          </div>
-        </div>
-      </section> */}
-
-      {/* CTA Section */}
-      {/* <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 animate-pulse"></div>
-        </div>
-        <div className="relative max-w-4xl mx-auto text-center space-y-8">
-          <h2 className="text-5xl font-bold text-white leading-tight">
-            Ready to Transform Your
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
-              Institution?
-            </span>
-          </h2>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            Join the future of attendance management. Start your free trial
-            today and see the difference.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <LoadingButton
-              href="/sign-up"
-              className="bg-white text-slate-900 hover:bg-slate-100 border-0 font-bold shadow-2xl hover:shadow-3xl px-12 py-4 text-lg transform hover:scale-105 transition-all duration-300 group"
-            >
-              <Zap className="w-5 h-5 mr-2 text-blue-600" />
-              Start Free Trial
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </LoadingButton>
-            <div className="text-blue-200 text-sm">
-              <CheckCircle className="w-4 h-4 inline mr-2" />
-              30-day free trial • No setup fees • Cancel anytime
-            </div>
-          </div>
-        </div>
-      </section> */}
-
       {/* Footer */}
       <footer className="bg-slate-900 text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-slate-900 to-slate-800"></div>

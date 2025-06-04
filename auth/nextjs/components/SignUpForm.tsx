@@ -165,27 +165,38 @@ export function SignUpForm() {
                 <div className="relative">
                   <UserCheck className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 w-4 h-4 z-10" />
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="pl-10 bg-white/10 border-white/20 text-gray-900 focus:border-white/40 focus:bg-white/15 rounded-lg h-12 [&>span]:text-white [&>span]:placeholder:text-white/50">
-                      <SelectValue placeholder="Select your role" />
+                    <SelectTrigger className="hover:cursor-pointer pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:border-white/40 focus:bg-white/15 rounded-lg h-12 backdrop-blur-sm transition-all duration-200 hover:bg-white/15">
+                      <SelectValue
+                        placeholder="Select your role"
+                        className="text-white"
+                      />
                     </SelectTrigger>
-                    <SelectContent className="bg-white backdrop-blur-md border border-gray-200 shadow-lg">
+                    <SelectContent className="bg-transparent backdrop-blur-xl border border-white/20 shadow-2xl rounded-lg overflow-hidden">
                       <SelectItem
                         value="FACULTY"
-                        className="hover:bg-blue-150 focus:bg-blue-50 hover:text-gray-900 focus:text-gray-900 text-gray-900 cursor-pointer"
+                        className="hover:bg-white/15 focus:bg-white/15 text-white hover:text-white focus:text-white cursor-pointer transition-all duration-200 px-4 py-3 border-b border-white/10 last:border-b-0"
                       >
-                        <div className="flex items-center gap-2">
-                          <GraduationCap className="w-4 h-4 text-blue-600" />
-                          <span className="text-inherit">Faculty Member</span>
+                        <div className="flex items-center gap-3">
+                          {/* <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                            <GraduationCap className="w-4 h-4 text-white" />
+                          </div> */}
+                          <span className="text-white font-medium">
+                            Faculty Member
+                          </span>
                         </div>
                       </SelectItem>
 
                       <SelectItem
                         value="STUDENT"
-                        className="hover:bg-blue-150 focus:bg-blue-50 hover:text-gray-900 focus:text-gray-900 text-gray-900 cursor-pointer"
+                        className="hover:bg-white/15 focus:bg-white/15 text-white hover:text-white focus:text-white cursor-pointer transition-all duration-200 px-4 py-3"
                       >
-                        <div className="flex items-center gap-2">
-                          <GraduationCap className="w-4 h-4 text-blue-600" />
-                          <span className="text-inherit">Student</span>
+                        <div className="flex items-center gap-3">
+                          {/* <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                            <User className="w-4 h-4 text-white" />
+                          </div> */}
+                          <span className="text-white font-medium">
+                            Student
+                          </span>
                         </div>
                       </SelectItem>
                     </SelectContent>
