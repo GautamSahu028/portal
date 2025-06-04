@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { AttendanceByDateItem, FacultyProfile } from "@/utils/types";
-import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -36,7 +35,7 @@ interface SubjectPreview {
 const AttendanceResultComponent: React.FC<AttendanceResultComponentProps> = ({
   faculty,
 }) => {
-  const today = format(new Date(), "yyyy-MM-dd");
+  const today = new Date().toISOString().split("T")[0];
 
   const [loading, setLoading] = useState<boolean>(false);
 
