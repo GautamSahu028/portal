@@ -102,13 +102,31 @@ const EmptyState: React.FC<EmptyStateProps> = ({ onClick }) => {
           </div>
           <div className="flex flex-wrap gap-2">
             {[
-              "Arya Stark",
-              "Cersei Lannister",
-              "Daenerys Targaryen",
-              "Jamie Lannister",
-              "Jon Snow",
-              "Ned Stark",
               "Tyrion Lannister",
+              "Jon Snow",
+              "Daenerys Targaryen",
+              "Arya Stark",
+              "Sansa Stark",
+              "Bran Stark",
+              "Cersei Lannister",
+              "Jaime Lannister",
+              "Jorah Mormont",
+              "Samwell Tarly",
+              "Theon Greyjoy",
+              "Petyr Baelish",
+              "Varys",
+              "Bronn",
+              "Sandor Clegane",
+              "Davos Seaworth",
+              "Brienne of Tarth",
+              "Gilly",
+              "Missandei",
+              "Grey Worm",
+              "Ygritte",
+              "Margaery Tyrell",
+              "Stannis Baratheon",
+              "Melisandre",
+              "Gendry",
             ].map((name) => (
               <span
                 key={name}

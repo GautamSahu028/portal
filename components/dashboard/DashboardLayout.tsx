@@ -46,23 +46,56 @@ export default function DashboardLayout({
   const navItems = isStudent ? getStudentNavItems() : getFacultyNavItems();
 
   return (
-    <div className="flex h-screen flex-col overflow-hiddenl">
+    <div className="flex h-screen flex-col overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div
+          className="absolute bottom-20 right-20 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-500/5 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "2s" }}
+        ></div>
+      </div>
+
+      {/* Grid Pattern */}
+      <div
+        className="absolute inset-0 opacity-5 pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")`,
+        }}
+      ></div>
+
       {/* Mobile Header */}
-      <div className="border-b lg:hidden">
+      <div className="border-b border-white/10 bg-white/5 backdrop-blur-xl lg:hidden relative z-10">
         <div className="flex h-16 items-center justify-between px-4">
           <div className="flex items-center">
             <Button
               variant="outline"
               size="icon"
-              className="mr-2"
+              className="mr-2 bg-white/10 border-white/20 hover:bg-white/20 text-white"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
               <Menu className="h-5 w-5" />
               <span className="sr-only">Toggle Menu</span>
             </Button>
-            <Link href="/" className="flex items-center">
-              <GraduationCap className="h-6 w-6 text-primary" />
-              <span className="ml-2 text-xl font-bold">EduManage</span>
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="relative">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-cyan-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                  <GraduationCap className="w-5 h-5 text-white" />
+                </div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl opacity-0 group-hover:opacity-30 blur transition-all duration-300"></div>
+              </div>
+              <div>
+                <span className="text-lg font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+                  EduManage
+                </span>
+                <div className="text-xs text-blue-300 font-medium tracking-wide">
+                  PROFESSIONAL
+                </div>
+              </div>
             </Link>
           </div>
           <div className="flex items-center gap-2">
@@ -79,38 +112,60 @@ export default function DashboardLayout({
             className="fixed inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           />
-          <div className="fixed inset-y-0 left-0 w-80 bg-background p-6 shadow-lg">
+          <div className="fixed inset-y-0 left-0 w-80 bg-gradient-to-b from-slate-900/95 via-blue-900/95 to-indigo-900/95 backdrop-blur-xl border-r border-white/10 p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-8">
               <Link
                 href="/"
-                className="flex items-center"
+                className="flex items-center gap-3 group"
                 onClick={() => setSidebarOpen(false)}
               >
-                <GraduationCap className="h-6 w-6 text-primary" />
-                <span className="ml-2 text-xl font-bold">EduManage</span>
+                <div className="relative">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-cyan-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                    <GraduationCap className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl opacity-0 group-hover:opacity-30 blur transition-all duration-300"></div>
+                </div>
+                <div>
+                  <span className="text-lg font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+                    EduManage
+                  </span>
+                  <div className="text-xs text-blue-300 font-medium tracking-wide">
+                    PROFESSIONAL
+                  </div>
+                </div>
               </Link>
               <Button
                 variant="outline"
                 size="icon"
+                className="bg-white/10 border-white/20 hover:bg-white/20 text-white"
                 onClick={() => setSidebarOpen(false)}
               >
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            <nav className="space-y-1">
+            <nav className="space-y-2">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+                    "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 group",
                     pathname === item.href
-                      ? "bg-accent text-accent-foreground"
-                      : "transparent"
+                      ? "bg-white/20 text-white shadow-lg backdrop-blur-sm border border-white/20"
+                      : "text-white/80 hover:text-white hover:bg-white/10 hover:backdrop-blur-sm"
                   )}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  {item.icon}
+                  <div
+                    className={cn(
+                      "transition-all duration-300",
+                      pathname === item.href
+                        ? "text-blue-300"
+                        : "group-hover:text-blue-300"
+                    )}
+                  >
+                    {item.icon}
+                  </div>
                   {item.title}
                 </Link>
               ))}
@@ -120,39 +175,60 @@ export default function DashboardLayout({
       )}
 
       {/* Desktop Layout */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative z-10">
         {/* Desktop Sidebar */}
-        <aside className="hidden w-64 border-r bg-background lg:block">
+        <aside className="hidden w-64 border-r border-white/10 bg-white/5 backdrop-blur-xl lg:block relative">
           <div className="flex flex-col h-full">
-            <div className="flex h-16 items-center border-b px-6">
-              <Link href="/" className="flex items-center">
-                <GraduationCap className="h-6 w-6 text-primary" />
-                <span className="ml-2 text-xl font-bold">EduManage</span>
+            <div className="flex h-16 items-center border-b border-white/10 px-6">
+              <Link href="/" className="flex items-center gap-3 group">
+                <div className="relative">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-cyan-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                    <GraduationCap className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl opacity-0 group-hover:opacity-30 blur transition-all duration-300"></div>
+                </div>
+                <div>
+                  <span className="text-lg font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+                    EduManage
+                  </span>
+                  <div className="text-xs text-blue-300 font-medium tracking-wide">
+                    PROFESSIONAL
+                  </div>
+                </div>
               </Link>
             </div>
             <nav className="flex-1 overflow-auto p-3">
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {navItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors",
+                      "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 group",
                       pathname === item.href
-                        ? "bg-accent text-accent-foreground"
-                        : "transparent"
+                        ? "bg-white/20 text-white shadow-lg backdrop-blur-sm border border-white/20"
+                        : "text-white/80 hover:text-white hover:bg-white/10 hover:backdrop-blur-sm"
                     )}
                   >
-                    {item.icon}
+                    <div
+                      className={cn(
+                        "transition-all duration-300",
+                        pathname === item.href
+                          ? "text-blue-300"
+                          : "group-hover:text-blue-300"
+                      )}
+                    >
+                      {item.icon}
+                    </div>
                     {item.title}
                   </Link>
                 ))}
               </div>
             </nav>
-            <div className="border-t p-3">
+            <div className="border-t border-white/10 p-3">
               <Button
                 variant="outline"
-                className="w-full justify-start gap-2"
+                className="w-full justify-start gap-2 bg-white/10 border-white/20 hover:bg-white/20 text-white hover:text-white transition-all duration-300"
                 onClick={handleLogout}
               >
                 <LogOut className="h-4 w-4" />
@@ -165,13 +241,13 @@ export default function DashboardLayout({
         {/* Main Content */}
         <main className="flex-1 overflow-hidden flex flex-col">
           {/* Fixed Search Bar */}
-          <div className="hidden h-16 items-center gap-4 border-b px-6 lg:flex shrink-0">
+          <div className="hidden h-16 items-center gap-4 border-b border-white/10 px-6 lg:flex shrink-0 bg-white/5 backdrop-blur-xl">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-white/60" />
               <Input
                 type="search"
                 placeholder="Search..."
-                className="w-full rounded-md border pl-8 bg-background"
+                className="w-full rounded-xl border-white/20 pl-10 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/60 focus:border-blue-400/50 focus:ring-blue-400/20"
               />
             </div>
             <div className="flex items-center gap-4">
@@ -181,7 +257,11 @@ export default function DashboardLayout({
           </div>
 
           {/* Scrollable Content */}
-          <div className="flex-1 overflow-auto p-6">{children}</div>
+          <div className="flex-1 overflow-auto p-6">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl min-h-full">
+              {children}
+            </div>
+          </div>
         </main>
       </div>
     </div>
@@ -206,7 +286,10 @@ function UserMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+        <Button
+          variant="ghost"
+          className="relative h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 transition-all duration-300"
+        >
           <Avatar className="h-8 w-8">
             <AvatarImage
               src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -214,21 +297,30 @@ function UserMenu({
               )}&background=random`}
               alt={user.name}
             />
-            <AvatarFallback>{initials}</AvatarFallback>
+            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-xs font-bold">
+              {initials}
+            </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent
+        className="w-56 bg-slate-900/95 backdrop-blur-xl border-white/20 shadow-2xl"
+        align="end"
+        forceMount
+      >
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.name}</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {user.email}
+            <p className="text-sm font-medium leading-none text-white">
+              {user.name}
             </p>
+            <p className="text-xs leading-none text-white/60">{user.email}</p>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onLogout}>
+        <DropdownMenuSeparator className="bg-white/20" />
+        <DropdownMenuItem
+          onClick={onLogout}
+          className="text-white hover:bg-white/10 focus:bg-white/10 cursor-pointer"
+        >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>
