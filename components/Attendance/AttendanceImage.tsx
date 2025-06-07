@@ -138,30 +138,28 @@ const AttendanceImage: React.FC<AttendanceImageProps> = ({
   ];
 
   return (
-    <div className="space-y-6 min-w-0">
-      {/* Preview Image with Remove Button */}
-      <div className="bg-muted rounded-2xl border border-border p-6 shadow-md overflow-hidden relative group">
+    <div className="space-y-8 min-w-0">
+      {/* Preview Image with Glassmorphism */}
+      <div className="backdrop-blur-xl bg-blue-500/10 border border-blue-300/20 rounded-2xl p-8 shadow-2xl overflow-hidden relative group">
         {/* Image */}
-        <div className="w-full overflow-hidden rounded-xl">
+        <div className="w-full overflow-hidden rounded-2xl border border-blue-300/20 backdrop-blur-sm bg-blue-400/5 shadow-inner">
           <Image
             src={imagePreview}
             alt="Attendance"
             width={800}
             height={600}
             unoptimized
-            className="w-full h-auto max-h-96 object-contain rounded-xl shadow-sm border border-border transition-transform group-hover:scale-[1.02]"
+            className="w-full h-auto max-h-96 object-contain rounded-2xl transition-all duration-500 group-hover:scale-[1.02]"
           />
         </div>
       </div>
 
-      {/* Image Details Section */}
-      <div className="bg-muted rounded-2xl border border-border p-6 shadow-sm">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="bg-green-100 dark:bg-green-500/20 border border-green-300 dark:border-green-500/30 rounded-lg p-2 flex-shrink-0">
-            <svg
-              className="w-5 h-5 text-green-600 dark:text-green-400"
-              viewBox="0 0 24 24"
-            >
+      {/* Image Details Section with Glassmorphism */}
+      <div className="backdrop-blur-xl bg-blue-500/10 border border-blue-300/20 rounded-2xl p-8 shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <div className="backdrop-blur-sm bg-gradient-to-br from-green-400/20 to-emerald-500/20 border border-green-300/30 rounded-xl p-3 flex-shrink-0 shadow-lg">
+            <svg className="w-6 h-6 text-green-300" viewBox="0 0 24 24">
               <path
                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
                   10-4.48 10-10S17.52 2 12 2zm0 18
@@ -172,34 +170,41 @@ const AttendanceImage: React.FC<AttendanceImageProps> = ({
               />
             </svg>
           </div>
-          <h4 className="text-lg font-semibold text-foreground truncate">
+          <h4 className="text-xl font-bold text-blue-50/90 tracking-tight">
             File Information
           </h4>
         </div>
 
+        {/* Details Grid */}
         <div className="grid gap-4">
           {detailItems.map((item, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-4 bg-background border border-border rounded-xl hover:shadow-sm"
+              className="flex items-center justify-between p-5 backdrop-blur-sm bg-blue-400/5 border border-blue-300/20 rounded-xl hover:bg-blue-400/10 transition-all duration-300 hover:scale-[1.01] hover:shadow-lg"
             >
-              <div className="flex items-center gap-3">
-                <div className="text-muted-foreground">{item.icon}</div>
-                <span className="font-medium text-foreground">
+              <div className="flex items-center gap-4">
+                <div className="text-blue-200/80 p-1">{item.icon}</div>
+                <span className="font-semibold text-blue-100/90 text-sm">
                   {item.label}:
                 </span>
               </div>
-              <span className="text-right text-muted-foreground max-w-[60%] break-words">
+              <span className="text-right text-blue-200/70 max-w-[60%] break-words text-sm font-medium">
                 {item.value}
               </span>
             </div>
           ))}
         </div>
 
-        <div className="mt-6 flex items-center justify-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-300 rounded-full border border-green-300 dark:border-green-500/30">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium">Upload Successful</span>
+        {/* Success Status */}
+        <div className="mt-8 flex items-center justify-center">
+          <div className="inline-flex items-center gap-3 px-6 py-3 backdrop-blur-sm bg-gradient-to-r from-green-400/20 to-emerald-500/20 text-green-200 rounded-full border border-green-300/30 shadow-lg">
+            <div className="relative">
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
+              <div className="absolute inset-0 w-3 h-3 bg-green-400/30 rounded-full animate-ping"></div>
+            </div>
+            <span className="text-sm font-semibold tracking-wide">
+              Upload Successful
+            </span>
           </div>
         </div>
       </div>

@@ -242,25 +242,27 @@ function CameraComponent({ onCapture, onClose }: CameraComponentProps) {
   }
 
   return (
-    <div className="border border-border rounded-xl bg-muted p-6 shadow-sm">
+    <div className="backdrop-blur-xl bg-blue-500/10 border border-blue-300/20 rounded-2xl p-8 shadow-2xl">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-foreground">Camera</h2>
-        <div className="flex gap-2">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-blue-50/90 tracking-tight">
+          Camera
+        </h2>
+        <div className="flex gap-3">
           <button
             onClick={handleCapture}
             disabled={!isReady}
-            className={`hover:cursor-pointer px-4 py-2 rounded-lg text-sm font-medium bg-primary/10 focus:outline-none focus:ring-2 ${
+            className={`px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 backdrop-blur-sm border ${
               isReady
-                ? "bg-primary text-white hover:bg-primary/30 focus:ring-primary"
-                : "bg-muted text-muted-foreground cursor-not-allowed"
+                ? "bg-gradient-to-r from-blue-500/80 to-purple-600/80 border-blue-300/30 text-blue-50 hover:from-blue-600/90 hover:to-purple-700/90 hover:scale-105 shadow-lg hover:shadow-blue-500/25"
+                : "bg-blue-400/10 border-blue-300/20 text-blue-300/60 cursor-not-allowed"
             }`}
           >
             {isReady ? "Capture" : "Initializing..."}
           </button>
           <button
             onClick={handleClose}
-            className="px-4 py-2 rounded-lg text-sm font-medium bg-destructive text-white hover:bg-destructive/90 focus:outline-none focus:ring-2 focus:ring-destructive"
+            className="px-6 py-3 rounded-xl text-sm font-semibold bg-gradient-to-r from-red-500/80 to-pink-500/80 border border-blue-300/30 text-blue-50 hover:from-red-600/90 hover:to-pink-600/90 hover:scale-105 transition-all duration-300 backdrop-blur-sm shadow-lg hover:shadow-red-500/25"
           >
             Cancel
           </button>
@@ -269,19 +271,22 @@ function CameraComponent({ onCapture, onClose }: CameraComponentProps) {
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm">
-          {error}
+        <div className="mb-6 backdrop-blur-sm bg-red-500/20 border border-red-400/30 text-red-100 px-5 py-4 rounded-xl text-sm shadow-lg">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+            {error}
+          </div>
         </div>
       )}
 
       {/* Camera View */}
-      <div className="overflow-hidden rounded-lg border border-border bg-background flex justify-center">
+      <div className="overflow-hidden rounded-2xl border border-blue-300/20 backdrop-blur-sm bg-blue-400/5 shadow-inner">
         <video
           ref={videoRef}
           autoPlay
           playsInline
           muted
-          className="w-full max-h-[500px] object-contain rounded"
+          className="w-full max-h-[500px] object-contain rounded-2xl"
         />
       </div>
 
@@ -289,9 +294,12 @@ function CameraComponent({ onCapture, onClose }: CameraComponentProps) {
 
       {/* Loading Indicator */}
       {!isReady && !error && (
-        <div className="mt-4 text-center text-muted-foreground text-sm flex justify-center items-center gap-2">
-          <div className="w-4 h-4 border-2 border-t-transparent border-gray-400 rounded-full animate-spin"></div>
-          Initializing camera...
+        <div className="mt-6 text-center text-blue-200/80 text-sm flex justify-center items-center gap-3">
+          <div className="relative">
+            <div className="w-5 h-5 border-2 border-blue-300/30 rounded-full"></div>
+            <div className="absolute top-0 left-0 w-5 h-5 border-2 border-t-blue-200/90 border-r-blue-200/90 border-b-transparent border-l-transparent rounded-full animate-spin"></div>
+          </div>
+          <span className="font-medium">Initializing camera...</span>
         </div>
       )}
     </div>

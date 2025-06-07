@@ -10,7 +10,6 @@ import {
   CheckCircle,
   Zap,
   Globe,
-  Star,
 } from "lucide-react";
 
 import { LogOutButton } from "@/auth/nextjs/components/LogOutButton";
@@ -72,24 +71,6 @@ export default async function HomePage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left content */}
             <div className="text-center lg:text-left space-y-8">
-              <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 group">
-                <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
-                  <CheckCircle size={14} className="text-white" />
-                </div>
-                <span className="text-sm text-white font-semibold tracking-wide">
-                  Trusted by 500+ Institutions
-                </span>
-                <div className="flex gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={12}
-                      className="text-yellow-400 fill-current"
-                    />
-                  ))}
-                </div>
-              </div>
-
               <div className="space-y-6">
                 <h1 className="text-6xl lg:text-7xl font-bold text-white leading-tight">
                   <span className="block">Future of</span>

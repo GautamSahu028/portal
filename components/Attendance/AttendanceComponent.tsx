@@ -231,8 +231,8 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
   );
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="p-6 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-800 via-blue-900 to-indigo-900 text-white">
+      <div className="p-6 space-y-8">
         <AttendanceHeader
           getTodayDate={getTodayDate}
           handleTakeAttendance={handleTakeAttendance}
@@ -248,103 +248,121 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
         />
 
         {/* Course Selection Card */}
-        <div className="bg-muted rounded-2xl border border-border p-6 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-500/20 rounded-lg flex items-center justify-center">
-              <svg
-                className="w-4 h-4 text-blue-600 dark:text-blue-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-foreground">
-                Select Course
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Choose the course for attendance tracking
-              </p>
-            </div>
-          </div>
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500 group relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-          <div className="space-y-4">
-            <div>
-              <label
-                htmlFor="course-select"
-                className="block text-sm font-medium text-muted-foreground mb-2"
-              >
-                Course Selection
-              </label>
-              <select
-                id="course-select"
-                value={selectedCourseId}
-                onChange={(e) => handleCourseSelect(e.target.value)}
-                className="w-full px-4 py-2.5 bg-background border border-border rounded-md text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
-              >
-                <option value="">-- Select a Course --</option>
-                {courses.map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.code} - {course.name} (
-                    {course.enrolledStudentsCount} students)
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {courseSelectionError && (
-              <div className="flex items-start gap-3 p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="w-5 h-5 text-destructive mt-0.5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <p className="text-sm font-medium text-destructive-foreground">
-                  {courseSelectionError}
+          <div className="relative">
+            <div className="flex items-center gap-6 mb-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                <svg
+                  className="w-8 h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+                  Select Course
+                </h2>
+                <p className="text-white/60 font-medium">
+                  Choose the course for attendance tracking
                 </p>
               </div>
-            )}
+            </div>
 
-            {selectedCourse && (
-              <div className="flex items-start gap-3 p-4 bg-blue-100 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-blue-600 dark:text-blue-300">
-                    Selected Course: {selectedCourse.code} –{" "}
-                    {selectedCourse.name}
-                  </h3>
-                  <p className="text-sm text-blue-500 dark:text-blue-400 mt-1">
-                    Enrolled Students: {selectedCourse.enrolledStudentsCount}
-                    {selectedCourse.description && (
-                      <span className="ml-2">
-                        • {selectedCourse.description}
-                      </span>
-                    )}
+            <div className="space-y-6">
+              <div>
+                <label
+                  htmlFor="course-select"
+                  className="block text-sm font-semibold text-white/80 mb-3"
+                >
+                  Course Selection
+                </label>
+                <select
+                  id="course-select"
+                  value={selectedCourseId}
+                  onChange={(e) => handleCourseSelect(e.target.value)}
+                  className="w-full px-6 py-4 bg-white/5 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400/50 transition-all duration-300 hover:bg-white/10"
+                >
+                  <option value="">-- Select a Course --</option>
+                  {courses.map((course) => (
+                    <option
+                      key={course.id}
+                      value={course.id}
+                      className="bg-slate-800 text-white"
+                    >
+                      {course.code} - {course.name} (
+                      {course.enrolledStudentsCount} students)
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {courseSelectionError && (
+                <div className="flex items-start gap-4 p-6 bg-red-500/10 backdrop-blur-sm border border-red-500/20 rounded-xl shadow-lg">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+                      <svg
+                        className="w-5 h-5 text-red-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-sm font-semibold text-red-200">
+                    {courseSelectionError}
                   </p>
                 </div>
-              </div>
-            )}
+              )}
+
+              {selectedCourse && (
+                <div className="flex items-start gap-4 p-6 bg-blue-500/10 backdrop-blur-sm border border-blue-500/20 rounded-xl shadow-lg animate-fadeInUp">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                      <svg
+                        className="w-5 h-5 text-blue-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-blue-200">
+                      Selected Course: {selectedCourse.code} –{" "}
+                      {selectedCourse.name}
+                    </h3>
+                    <p className="text-sm text-blue-300 mt-2">
+                      Enrolled Students: {selectedCourse.enrolledStudentsCount}
+                      {selectedCourse.description && (
+                        <span className="ml-2">
+                          • {selectedCourse.description}
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -362,7 +380,7 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
 
         {/* Camera Component */}
         {isCameraOpen && (
-          <div className="bg-muted backdrop-blur-sm rounded-2xl border border-border overflow-hidden">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden shadow-2xl">
             <CameraComponent
               onCapture={handleCameraCapture}
               onClose={handleCameraClose}
@@ -372,58 +390,64 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
 
         {/* Image Upload and Results Section */}
         {uploadedImage && imagePreview && !isCameraOpen && (
-          <div className="bg-muted backdrop-blur-sm rounded-2xl border border-border p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-                <svg
-                  className="w-4 h-4 text-green-400"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold text-foreground">
-                  Attendance Processing
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  Review uploaded image and attendance results
-                </p>
-              </div>
-            </div>
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500 group relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/10 to-teal-600/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-            <div className="grid lg:grid-cols-2 gap-6">
-              {/* Image container with proper constraints */}
-              <div className="min-w-0 overflow-hidden">
-                <AttendanceImage
-                  imagePreview={imagePreview}
-                  uploadedImage={uploadedImage}
-                />
-              </div>
-
-              <div className="space-y-6 min-w-0">
+            <div className="relative">
+              <div className="flex items-center gap-6 mb-8">
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                  <svg
+                    className="w-8 h-8 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
                 <div>
-                  <h3 className="text-lg font-medium text-foreground mb-3">
-                    Processing Status
-                  </h3>
-                  <StatusMessage
-                    status={attendanceStatus}
-                    getTodayDate={getTodayDate}
+                  <h2 className="text-2xl font-bold text-white bg-gradient-to-r from-white to-emerald-200 bg-clip-text text-transparent">
+                    Attendance Processing
+                  </h2>
+                  <p className="text-white/60 font-medium">
+                    Review uploaded image and attendance results
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-8">
+                {/* Image container with proper constraints */}
+                <div className="min-w-0 overflow-hidden">
+                  <AttendanceImage
+                    imagePreview={imagePreview}
+                    uploadedImage={uploadedImage}
                   />
                 </div>
 
-                {/* Loading Indicator */}
-                {isProcessing && <LoadingIndicator />}
+                <div className="space-y-6 min-w-0">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-4">
+                      Processing Status
+                    </h3>
+                    <StatusMessage
+                      status={attendanceStatus}
+                      getTodayDate={getTodayDate}
+                    />
+                  </div>
 
-                {/* Attendance Results */}
-                {fullAttendanceRecords.length > 0 && (
-                  <AttendanceResults results={fullAttendanceRecords} />
-                )}
+                  {/* Loading Indicator */}
+                  {isProcessing && <LoadingIndicator />}
+
+                  {/* Attendance Results */}
+                  {fullAttendanceRecords.length > 0 && (
+                    <AttendanceResults results={fullAttendanceRecords} />
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -431,41 +455,44 @@ function AttendanceComponent({ courses }: { courses: FacultyCourse[] }) {
 
         {/* Empty State */}
         {!uploadedImage && !isCameraOpen && !error && (
-          <div className="bg-muted backdrop-blur-sm rounded-2xl border border-border relative overflow-hidden">
-            {/* Camera Button */}
-            <div className="flex items-center justify-end p-4 mr-4">
-              {/* Camera Button - Now in header for better alignment */}
-              <button
-                onClick={openCamera}
-                className="hover:cursor-pointer inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-                Open Camera
-              </button>
-            </div>
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl relative overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 group">
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/10 to-purple-600/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-            {/* Empty State Content */}
-            <div className="px-8 py-4">
-              <EmptyState onClick={handleEmptyStateClick} />
+            <div className="relative">
+              {/* Camera Button */}
+              <div className="flex items-center justify-end p-8 pb-0">
+                <button
+                  onClick={openCamera}
+                  className="mb-4 inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 border border-indigo-400/30"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-6 h-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2-2V9z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  Open Camera
+                </button>
+              </div>
+
+              {/* Empty State Content */}
+              <div className="px-8 pb-8">
+                <EmptyState onClick={handleEmptyStateClick} />
+              </div>
             </div>
           </div>
         )}

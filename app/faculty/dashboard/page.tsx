@@ -59,9 +59,9 @@ export default async function FacultyDashboard() {
 
                 <div className="flex items-center gap-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3">
                   <Mail className="w-5 h-5 text-cyan-300" />
-                  <div>
+                  <div className="min-w-0 max-w-xs">
                     <p className="text-xs text-white/60 font-medium">Email</p>
-                    <p className="text-white font-semibold text-sm">
+                    <p className="text-white font-semibold text-sm break-words whitespace-normal">
                       {faculty.data.email}
                     </p>
                   </div>
