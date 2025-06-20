@@ -177,9 +177,6 @@ export function SignUpForm() {
                         className="hover:bg-white/15 focus:bg-white/15 text-white hover:text-white focus:text-white cursor-pointer transition-all duration-200 px-4 py-3 border-b border-white/10 last:border-b-0"
                       >
                         <div className="flex items-center gap-3">
-                          {/* <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                            <GraduationCap className="w-4 h-4 text-white" />
-                          </div> */}
                           <span className="text-white font-medium">
                             Faculty Member
                           </span>
@@ -191,9 +188,6 @@ export function SignUpForm() {
                         className="hover:bg-white/15 focus:bg-white/15 text-white hover:text-white focus:text-white cursor-pointer transition-all duration-200 px-4 py-3"
                       >
                         <div className="flex items-center gap-3">
-                          {/* <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                            <User className="w-4 h-4 text-white" />
-                          </div> */}
                           <span className="text-white font-medium">
                             Student
                           </span>
